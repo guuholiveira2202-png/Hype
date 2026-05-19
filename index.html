@@ -13,7 +13,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
     <style>
-       /* ========================
+    /* ========================
            VARIÁVEIS E RESET
            ======================== */
         :root {
@@ -272,20 +272,24 @@
         .add-btn:hover { background: var(--accent-color); color: #131110; border-color: var(--accent-color); box-shadow: var(--accent-glow); }
 
         /* ========================
-           SACOLA (SIDEBAR)
+           SACOLA (SIDEBAR) CORRIGIDA
            ======================== */
         #sidebar {
-            position: fixed; top: 0; right: -420px;
-            width: 420px; max-width: 100%; 
-            height: 100dvh; /* CORREÇÃO APLICADA */
-            max-height: 100dvh; /* CORREÇÃO APLICADA */
+            position: fixed; 
+            top: 0; 
+            bottom: 0; /* Força a travar no fundo da tela, resolve o espaço branco */
+            right: -420px;
+            width: 420px; 
+            max-width: 100%; 
             background: var(--bg-panel);
             backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
             border-left: 1px solid rgba(181, 124, 94, 0.15);
             box-shadow: -10px 0 40px rgba(0,0,0,0.7);
-            z-index: 200; transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex; flex-direction: column;
-            overflow: hidden; /* CORREÇÃO APLICADA */
+            z-index: 200; 
+            transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex; 
+            flex-direction: column;
+            overscroll-behavior: contain; /* Impede o navegador de dar o 'puxão' que mostra o fundo */
         }
         #sidebar.open { right: 0; }
 
@@ -330,7 +334,7 @@
             display: flex; 
             gap: 8px; 
             margin-bottom: 8px; 
-            flex-wrap: wrap; /* CORREÇÃO APLICADA */
+            flex-wrap: wrap; 
         }
         .shipping-input-group input {
             flex-grow: 1; 
@@ -340,8 +344,8 @@
             color: #fff; 
             padding: 12px 20px; 
             font-size: 0.85rem;
-            min-width: 0; /* CORREÇÃO APLICADA */
-            width: 100%; /* CORREÇÃO APLICADA */
+            min-width: 0; 
+            width: 100%;
         }
         .shipping-input-group input:focus { border-color: var(--accent-color); }
         .shipping-input-group button {
@@ -361,22 +365,26 @@
         .total-row.final span:last-child { color: var(--accent-light); text-shadow: var(--accent-glow); font-family: var(--font-display); }
 
         /* ========================
-           MODAIS ULTRA ARREDONDADOS
+           MODAIS ULTRA ARREDONDADOS CORRIGIDOS
            ======================== */
         .modal {
-            display: none; position: fixed;
+            display: none; 
+            position: fixed;
             top: 50%; left: 50%; transform: translate(-50%, -55%);
-            background: #110e0d; border: 1px solid rgba(181, 124, 94, 0.25);
-            border-radius: 20px; padding: 35px;
-            z-index: 300; width: 90%; max-width: 440px;
-            max-height: 90dvh; /* CORREÇÃO APLICADA */
-            overflow-y: auto; /* CORREÇÃO APLICADA */
+            background: #110e0d; 
+            border: 1px solid rgba(181, 124, 94, 0.25);
+            border-radius: 20px; 
+            padding: 35px;
+            z-index: 300; 
+            width: 90%; max-width: 440px;
+            max-height: 85vh; /* Um limite menor previne bugs com teclados de celular */
+            overflow-y: auto; 
+            overscroll-behavior: contain; /* Impede vazamento do scroll */
             box-shadow: 0 25px 60px rgba(0,0,0,0.8);
             opacity: 0; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .modal.active { display: block; opacity: 1; transform: translate(-50%, -50%); }
 
-        /* Scrollbar interno do modal para não ficar feio (CORREÇÃO APLICADA) */
         .modal::-webkit-scrollbar { width: 4px; }
         .modal::-webkit-scrollbar-track { background: transparent; }
         .modal::-webkit-scrollbar-thumb { background: #3a2b23; border-radius: 10px; }
@@ -391,8 +399,8 @@
         .form-group input {
             background: rgba(255,255,255,0.02); border: 1px solid rgba(181, 124, 94, 0.2);
             border-radius: 50px; padding: 12px 20px; color: #fff; font-size: 0.9rem; transition: var(--transition-smooth);
-            min-width: 0; /* CORREÇÃO APLICADA */
-            width: 100%; /* CORREÇÃO APLICADA */
+            min-width: 0; 
+            width: 100%; 
         }
         .form-group input:focus { border-color: var(--accent-color); box-shadow: var(--accent-glow); }
         
