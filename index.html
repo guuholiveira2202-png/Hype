@@ -13,7 +13,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
     <style>
-        /* ========================
+       /* ========================
            VARIÁVEIS E RESET
            ======================== */
         :root {
@@ -276,13 +276,16 @@
            ======================== */
         #sidebar {
             position: fixed; top: 0; right: -420px;
-            width: 420px; max-width: 100%; height: 100%;
+            width: 420px; max-width: 100%; 
+            height: 100dvh; /* CORREÇÃO APLICADA */
+            max-height: 100dvh; /* CORREÇÃO APLICADA */
             background: var(--bg-panel);
             backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
             border-left: 1px solid rgba(181, 124, 94, 0.15);
             box-shadow: -10px 0 40px rgba(0,0,0,0.7);
             z-index: 200; transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex; flex-direction: column;
+            overflow: hidden; /* CORREÇÃO APLICADA */
         }
         #sidebar.open { right: 0; }
 
@@ -323,11 +326,22 @@
         }
 
         .shipping-box { margin-bottom: 20px; }
-        .shipping-input-group { display: flex; gap: 8px; margin-bottom: 8px; }
+        .shipping-input-group { 
+            display: flex; 
+            gap: 8px; 
+            margin-bottom: 8px; 
+            flex-wrap: wrap; /* CORREÇÃO APLICADA */
+        }
         .shipping-input-group input {
-            flex-grow: 1; background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(181, 124, 94, 0.2); border-radius: 50px; 
-            color: #fff; padding: 12px 20px; font-size: 0.85rem;
+            flex-grow: 1; 
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(181, 124, 94, 0.2); 
+            border-radius: 50px; 
+            color: #fff; 
+            padding: 12px 20px; 
+            font-size: 0.85rem;
+            min-width: 0; /* CORREÇÃO APLICADA */
+            width: 100%; /* CORREÇÃO APLICADA */
         }
         .shipping-input-group input:focus { border-color: var(--accent-color); }
         .shipping-input-group button {
@@ -355,10 +369,17 @@
             background: #110e0d; border: 1px solid rgba(181, 124, 94, 0.25);
             border-radius: 20px; padding: 35px;
             z-index: 300; width: 90%; max-width: 440px;
+            max-height: 90dvh; /* CORREÇÃO APLICADA */
+            overflow-y: auto; /* CORREÇÃO APLICADA */
             box-shadow: 0 25px 60px rgba(0,0,0,0.8);
             opacity: 0; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .modal.active { display: block; opacity: 1; transform: translate(-50%, -50%); }
+
+        /* Scrollbar interno do modal para não ficar feio (CORREÇÃO APLICADA) */
+        .modal::-webkit-scrollbar { width: 4px; }
+        .modal::-webkit-scrollbar-track { background: transparent; }
+        .modal::-webkit-scrollbar-thumb { background: #3a2b23; border-radius: 10px; }
 
         .modal-header {
             display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;
@@ -370,6 +391,8 @@
         .form-group input {
             background: rgba(255,255,255,0.02); border: 1px solid rgba(181, 124, 94, 0.2);
             border-radius: 50px; padding: 12px 20px; color: #fff; font-size: 0.9rem; transition: var(--transition-smooth);
+            min-width: 0; /* CORREÇÃO APLICADA */
+            width: 100%; /* CORREÇÃO APLICADA */
         }
         .form-group input:focus { border-color: var(--accent-color); box-shadow: var(--accent-glow); }
         
@@ -467,7 +490,7 @@
         </header>
 
         <div class="quick-nav">
-            <a href="#hero" class="quick-select-btn active">Home</a>
+            
             <a href="#promocoes" class="quick-select-btn" style="color: var(--accent-light);">Sale</a>
             <a href="#camisas" class="quick-select-btn">Camisas</a>
             <a href="#moletons" class="quick-select-btn">Moletons</a>
