@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HYPE STORE | Terminal Admin</title>
+    <title>Magnata Imperium | Terminal Admin</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&family=Syncopate:wght@400;700&display=swap" rel="stylesheet">
 
@@ -124,13 +124,15 @@
         
         .status-badge { font-size: 0.65rem; font-weight: 700; padding: 6px 12px; border-radius: 4px; text-transform: uppercase; border: 1px solid currentColor; letter-spacing: 1px; }
         .status-badge.pendente { color: #ffd700; background: rgba(255, 215, 0, 0.05); }
+        .status-badge.pago, .status-badge.aprovado { color: var(--acid-green); background: rgba(204, 255, 0, 0.08); }
         .status-badge.enviado { color: #00f0ff; background: rgba(0, 240, 255, 0.05); }
-        .status-badge.entregue { color: var(--acid-green); background: rgba(204, 255, 0, 0.05); }
+        .status-badge.entregue { color: #00ff88; background: rgba(0, 255, 136, 0.08); }
         .status-badge.rejeitado { color: var(--red-alert); background: rgba(255, 42, 42, 0.05); }
 
         .terminal-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.03); }
         .grid-cell label { display: block; font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 5px; display: flex; align-items: center; gap: 5px; }
-        .grid-cell .main-data { font-size: 0.9rem; font-weight: 500; color: #fff; }
+        .grid-cell .main-data { font-size: 0.9rem; font-weight: 600; color: #fff; }
+        .grid-cell .email-data { font-size: 0.8rem; color: var(--text-main); margin-top: 2px; word-break: break-all; }
         .grid-cell .sub-data { font-size: 0.75rem; color: var(--acid-green); margin-top: 3px; }
         .grid-cell .total-val { font-family: var(--font-display); font-size: 1.2rem; color: var(--acid-green); text-shadow: var(--acid-glow); }
 
@@ -149,7 +151,6 @@
 
         .card-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
         .footer-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 5px; display: block; }
-        .controls-group { display: flex; gap: 15px; align-items: center; }
         
         .status-select { 
             background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border); color: #fff; 
@@ -191,7 +192,7 @@
 <body>
 
     <aside class="sidebar">
-        <div class="logo">HYPE<span>STORE</span></div>
+        <div class="logo">Magnata<span>Imperium</span></div>
         <nav class="nav-menu">
             <button class="nav-btn active" data-target="view-pedidos">🛒 Terminal de Pedidos</button>
             <button class="nav-btn" data-target="view-produtos">📦 Base de Produtos</button>
@@ -210,19 +211,19 @@
             <div class="profit-terminal">
                 <div class="profit-label">Lucro Total Confirmado</div>
                 <div class="profit-value" id="total-lucro">R$ 0,00</div>
-                <div style="font-size: 0.75rem; color: var(--text-muted);">Status base: Enviado / Entregue</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">Status base: Pago / Enviado / Entregue</div>
             </div>
 
             <div class="admin-tabs" id="order-tabs">
                 <button class="tab-btn active" data-filter="todos">Todos</button>
                 <button class="tab-btn" data-filter="pendente">Pendentes</button>
+                <button class="tab-btn" data-filter="pago">Pagos</button>
                 <button class="tab-btn" data-filter="enviado">Enviados</button>
                 <button class="tab-btn" data-filter="entregue">Entregues</button>
                 <button class="tab-btn" data-filter="rejeitado">Rejeitados</button>
             </div>
 
-            <div id="order-list" class="order-list">
-                </div>
+            <div id="order-list" class="order-list"></div>
         </section>
 
         <section id="view-produtos" class="view-section">
@@ -262,8 +263,7 @@
                 </form>
             </div>
 
-            <div id="product-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px;">
-                </div>
+            <div id="product-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px;"></div>
         </section>
 
     </main>
@@ -295,29 +295,33 @@
             });
         });
 
-        // ================= SISTEMA DE FILTRO DE ABAS =================
+        // ================= FILTRO DE ABAS =================
         let filtroAtual = 'todos';
 
         document.querySelectorAll('#order-tabs .tab-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
-                // Remove a classe ativa de todos e adiciona no clicado
                 document.querySelectorAll('#order-tabs .tab-btn').forEach(b => b.classList.remove('active'));
                 e.target.classList.add('active');
                 
-                // Salva o filtro selecionado
                 filtroAtual = e.target.dataset.filter;
-                
-                // Aplica o filtro na tela
                 aplicarFiltroPedidos();
             });
         });
 
         function aplicarFiltroPedidos() {
             document.querySelectorAll('.order-card').forEach(card => {
+                const cardStatus = (card.dataset.status || '').toLowerCase();
+                
                 if (filtroAtual === 'todos') {
                     card.style.display = 'flex';
+                } else if (filtroAtual === 'pago') {
+                    if (cardStatus.includes('pago') || cardStatus.includes('aprovado')) {
+                        card.style.display = 'flex';
+                    } else {
+                        card.style.display = 'none';
+                    }
                 } else {
-                    if (card.dataset.status === filtroAtual) {
+                    if (cardStatus.includes(filtroAtual)) {
                         card.style.display = 'flex';
                     } else {
                         card.style.display = 'none';
@@ -326,8 +330,7 @@
             });
         }
 
-
-        // ================= LÓGICA DE PEDIDOS =================
+        // ================= PEDIDOS EM TEMPO REAL =================
         const orderListDiv = document.getElementById('order-list');
         const lucroUI = document.getElementById('total-lucro');
 
@@ -344,8 +347,9 @@
             snapshot.forEach(doc => {
                 const p = doc.data();
                 const id = doc.id;
+                const statusNormalizado = (p.status || 'pendente').toLowerCase();
 
-                if (p.status === 'enviado' || p.status === 'entregue') {
+                if (statusNormalizado.includes('pago') || statusNormalizado.includes('aprovado') || statusNormalizado.includes('enviado') || statusNormalizado.includes('entregue')) {
                     totalProfit += (p.totals?.finalTotal || 0);
                 }
 
@@ -354,34 +358,40 @@
                 let itemsHtml = p.items?.map(item => `
                     <div class="item-row">
                         <div class="item-left">
-                            <img src="${item.img}">
+                            <img src="${item.img || ''}" alt="${item.name}">
                             <div class="item-info">
-                                <h4>${item.name}</h4>
-                                <span>Tamanho: ${item.size}</span>
+                                <h4>${item.name || 'Produto'}</h4>
+                                <span>Tamanho: ${item.size || 'Único'}</span>
                             </div>
                         </div>
                         <div style="display:flex; align-items:center; gap: 20px;">
                             <div class="qty-badge">1</div>
-                            <div class="item-price">${formatCurrency(item.price)}</div>
+                            <div class="item-price">${formatCurrency(item.price || 0)}</div>
                         </div>
                     </div>
                 `).join('') || "";
 
+                let badgeClass = 'pendente';
+                if (statusNormalizado.includes('pago') || statusNormalizado.includes('aprovado')) badgeClass = 'pago';
+                else if (statusNormalizado.includes('enviado')) badgeClass = 'enviado';
+                else if (statusNormalizado.includes('entregue')) badgeClass = 'entregue';
+                else if (statusNormalizado.includes('rejeitado')) badgeClass = 'rejeitado';
+
                 const card = document.createElement('div');
-                card.className = `order-card ${p.status === 'rejeitado' ? 'rejeitado' : ''}`;
-                // Adicionei esse data-status para o sistema de filtros saber qual aba ele pertence
-                card.setAttribute('data-status', p.status);
+                card.className = `order-card ${badgeClass === 'rejeitado' ? 'rejeitado' : ''}`;
+                card.setAttribute('data-status', p.status || 'pendente');
                 
                 card.innerHTML = `
                     <div class="card-header">
                         <div class="order-id">📦 PEDIDO: <span>#${id.substring(0,8).toUpperCase()}</span></div>
-                        <div class="status-badge ${p.status}">${p.status}</div>
+                        <div class="status-badge ${badgeClass}">${p.status || 'Pendente'}</div>
                     </div>
 
                     <div class="terminal-grid">
                         <div class="grid-cell">
                             <label>👤 CLIENTE</label>
-                            <div class="main-data">${p.cliente?.email || 'N/A'}</div>
+                            <div class="main-data">${p.cliente?.nome || 'Nome não informado'}</div>
+                            <div class="email-data">${p.cliente?.email || 'Gmail/E-mail N/A'}</div>
                             <div class="sub-data">${p.cliente?.whatsapp || ''}</div>
                         </div>
                         <div class="grid-cell">
@@ -389,11 +399,16 @@
                             <div class="main-data">${date.split(' ')[0]}</div>
                             <div class="sub-data" style="color:var(--text-muted)">${date.split(' ')[1] || ''}</div>
                         </div>
+                        
                         <div class="grid-cell">
                             <label>📍 ENDEREÇO</label>
-                            <div class="main-data">${p.shipping?.street || ''}, ${p.shipping?.number || ''}</div>
-                            <div class="sub-data" style="color:var(--text-muted)">${p.shipping?.city || ''}</div>
+                            <div class="main-data">${p.shipping?.logradouro || ''}, ${p.shipping?.numero || 'S/N'}</div>
+                            <div class="sub-data" style="color:var(--text-muted)">
+                                ${p.shipping?.bairro || ''} - ${p.shipping?.cidadeUF || ''}
+                            </div>
+                            ${p.shipping?.complemento ? `<div style="font-size: 0.75rem; color: #a0a0a0; margin-top: 2px;">Comp: ${p.shipping.complemento}</div>` : ''}
                         </div>
+                        
                         <div class="grid-cell">
                             <label>💳 TOTAL</label>
                             <div class="total-val">${formatCurrency(p.totals?.finalTotal || 0)}</div>
@@ -410,10 +425,11 @@
                         <div>
                             <span class="footer-label">ATUALIZAR STATUS DO PEDIDO</span>
                             <select class="status-select" onchange="updateStatus('${id}', this.value)">
-                                <option value="pendente" ${p.status==='pendente'?'selected':''}>⏳ Pendente</option>
-                                <option value="enviado" ${p.status==='enviado'?'selected':''}>🚚 Enviado</option>
-                                <option value="entregue" ${p.status==='entregue'?'selected':''}>✅ Entregue</option>
-                                <option value="rejeitado" ${p.status==='rejeitado'?'selected':''}>❌ Rejeitado</option>
+                                <option value="pendente" ${statusNormalizado === 'pendente' ? 'selected' : ''}>⏳ Pendente</option>
+                                <option value="Aprovado (Pago)" ${(statusNormalizado.includes('pago') || statusNormalizado.includes('aprovado')) ? 'selected' : ''}>💳 Pago / Aprovado</option>
+                                <option value="enviado" ${statusNormalizado === 'enviado' ? 'selected' : ''}>🚚 Enviado</option>
+                                <option value="entregue" ${statusNormalizado === 'entregue' ? 'selected' : ''}>✅ Entregue</option>
+                                <option value="rejeitado" ${statusNormalizado === 'rejeitado' ? 'selected' : ''}>❌ Rejeitado</option>
                             </select>
                         </div>
                         <button class="btn-danger-glass" onclick="rejeitarPedido('${id}')" style="align-self: flex-end;">[X] Rejeitar</button>
@@ -421,23 +437,29 @@
                 `;
                 orderListDiv.appendChild(card);
             });
+
             lucroUI.textContent = formatCurrency(totalProfit);
-            
-            // Re-aplica o filtro toda vez que o Firebase atualizar os dados
             aplicarFiltroPedidos();
         });
 
         async function updateStatus(id, val) {
-            await db.collection("pedidos").doc(id).update({ status: val });
+            try {
+                await db.collection("pedidos").doc(id).update({ 
+                    status: val,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            } catch (error) {
+                console.error("Erro ao atualizar status:", error);
+                alert("Erro ao alterar o status do pedido.");
+            }
         }
 
         async function rejeitarPedido(id) {
             if(confirm("Deseja rejeitar este pedido e removê-lo dos lucros?")) {
-                await db.collection("pedidos").doc(id).update({ status: 'rejeitado' });
+                await updateStatus(id, 'rejeitado');
             }
         }
 
-        // LIMPAR TODOS OS PEDIDOS (SEGURANÇA)
         async function limparTodosPedidos() {
             const confirmacao = prompt("⚠️ PERIGO: Isso apagará TODOS os pedidos do servidor.\nDigite CONFIRMAR em maiúsculas para continuar:");
             if (confirmacao === 'CONFIRMAR') {
@@ -462,15 +484,21 @@
             e.preventDefault();
             const btn = document.getElementById('btn-submit');
             btn.textContent = "PROCESSANDO...";
-            await db.collection("produtos").add({
-                nome: document.getElementById('prod-nome').value,
-                preco: parseFloat(document.getElementById('prod-preco').value),
-                img: document.getElementById('prod-img').value,
-                categoria: document.getElementById('prod-categoria').value,
-                criadoEm: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            formProd.reset();
-            btn.textContent = "CADASTRAR PRODUTO";
+            try {
+                await db.collection("produtos").add({
+                    nome: document.getElementById('prod-nome').value,
+                    preco: parseFloat(document.getElementById('prod-preco').value),
+                    img: document.getElementById('prod-img').value,
+                    categoria: document.getElementById('prod-categoria').value,
+                    criadoEm: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                formProd.reset();
+            } catch (error) {
+                console.error(error);
+                alert("Erro ao cadastrar produto.");
+            } finally {
+                btn.textContent = "CADASTRAR PRODUTO";
+            }
         });
 
         db.collection("produtos").orderBy("criadoEm", "desc").onSnapshot(snap => {
@@ -482,7 +510,7 @@
                     <div style="background:var(--glass-bg); padding:15px; border-radius:12px; border:1px solid var(--glass-border);">
                         <img src="${p.img}" style="width:100%; aspect-ratio:1; object-fit:cover; border-radius:8px; margin-bottom:12px; border:1px solid rgba(255,255,255,0.05);">
                         <h4 style="font-size:0.85rem; margin-bottom:5px; color:#fff;">${p.nome}</h4>
-                        <div style="color:var(--acid-green); font-family:var(--font-display); font-size:1rem; margin-bottom:15px;">${formatCurrency(p.preco)}</div>
+                        <div style="color:var(--acid-green); font-family:var(--font-display); font-size:1rem; margin-bottom:15px;">${formatCurrency(p.preco || 0)}</div>
                         <button onclick="deleteProd('${doc.id}')" class="btn-danger-glass" style="width:100%;">Excluir</button>
                     </div>
                 `;
