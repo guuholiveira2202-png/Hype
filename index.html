@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HYPE STORE | Premium Streetwear</title>
+    <title>MAGNATA IMPERIUM </title>
 
     <!-- Fontes Premium -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,500;0,700;1,400&display=swap" rel="stylesheet">
@@ -198,7 +198,7 @@
             padding: 200px 5% 140px;
             text-align: center;
             background: linear-gradient(to bottom, rgba(5, 5, 5, 0.3), rgba(5, 5, 5, 1)), 
-                        url('https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=1920&q=80') center/cover fixed;
+                        url('https://scontent-gru2-2.xx.fbcdn.net/v/t1.15752-9/756682778_1768614744328024_4516698446308594190_n.jpg?stp=dst-jpg_s960x960_tt6&_nc_cat=106&ccb=1-7&_nc_sid=9f807c&_nc_ohc=aYEZb8JbWLMQ7kNvwHzG4vN&_nc_oc=AdpgGnfFlT-tB8JoIrKKfE04SFBuJ4_nJiWfEJEOvjcAJDQsQp13XviI0LRo9BVS58Y&_nc_zt=23&_nc_ht=scontent-gru2-2.xx&_nc_ss=7b6a8&oh=03_Q7cD5wGKkcy4YJiyVdMvbu1I7rUeZ2fU8Qf37ZEz-Q8BOSqnTw&oe=6A8F9D02') center/cover fixed;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -641,7 +641,7 @@
 
     <!-- Header com botão de LOGIN / MINHA CONTA -->
     <header id="mainHeader">
-        <a href="#" class="logo">HYPE<span>.</span></a>
+        <a href="#" class="logo">Imperium<span>.</span></a>
         <div class="nav-actions">
             <button class="btn-header" onclick="toggleCart()">BAG (<span id="cart-count">0</span>)</button>
             <button class="btn-header gold-btn" id="user-login-btn" onclick="openLoginModal()">ENTRAR / PEDIDOS</button>
@@ -735,7 +735,7 @@
     <footer>
         <div class="footer-grid">
             <div class="footer-col">
-                <a href="#" class="logo" style="display:inline-block; margin-bottom:20px; font-size: 1.4rem;">HYPE<span>.</span></a>
+                <a href="#" class="logo" style="display:inline-block; margin-bottom:20px; font-size: 1.4rem;">IMPERIUM<span>.</span></a>
                 <p style="color: var(--text-dim); font-size: 0.85rem; max-width: 250px;">Ditando a cultura através de design visionário e construção de altíssimo nível.</p>
             </div>
             <div class="footer-col">
@@ -759,14 +759,14 @@
             <div class="footer-col">
                 <h4>Comunidade</h4>
                 <ul>
-                    <li><a href="#">Instagram</a></li>
-                    <li><a href="#">TikTok</a></li>
-                    <li><a href="#">X / Twitter</a></li>
+                    <li><a href="https:www.instagram.com/magnataimperium">Instagram</a></li>
+                    
+                    <li><a href="https:www.whatsapp.com"> Whatsapp</a></li>
                 </ul>
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2026 HYPE STORE BRAND. Todos os direitos reservados.</p>
+            <p>&copy; 2026 MAGNATA IMPERIUM  BRAND. Todos os direitos reservados.</p>
         </div>
     </footer>
 
@@ -908,48 +908,11 @@
         <div class="support-content" id="support-content"></div>
     </div>
 
-    <!-- Script de UI e Interações Visuais -->
-    <script>
-        const header = document.getElementById('mainHeader');
-        const taskyBar = document.getElementById('taskyBar');
-        const scrollBtn = document.getElementById('scrollTopBtn');
-        const navLinks = document.querySelectorAll('.quick-select-btn');
-
-        window.addEventListener('scroll', () => {
-            if (header) {
-                if (window.scrollY > 50) header.classList.add('scrolled');
-                else header.classList.remove('scrolled');
-            }
-            if (scrollBtn) {
-                if (window.scrollY > 50) scrollBtn.classList.add('show');
-                else scrollBtn.classList.remove('show');
-            }
-            if (taskyBar) {
-                if (window.scrollY > 100) taskyBar.classList.add('floating');
-                else taskyBar.classList.remove('floating');
-            }
-
-            let current = '';
-            document.querySelectorAll('section').forEach(section => {
-                const sectionTop = section.offsetTop;
-                if (window.scrollY >= sectionTop - 200) {
-                    current = section.getAttribute('id');
-                }
-            });
-
-            navLinks.forEach(link => {
-                link.classList.remove('active');
-                if (link.getAttribute('href') && link.getAttribute('href').includes(current)) {
-                    link.classList.add('active');
-                }
-            });
-        });
-    </script>
-
-    <!-- Script Principal: Firebase, Catálogo, Login Direto & Status do Pedido em Tempo Real -->
+   
+     <!-- Script Principal: Firebase, Catálogo, Login Direto & Status do Pedido em Tempo Real -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp, query, where, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         // Configuração do Firebase
         const firebaseConfig = {
@@ -980,6 +943,29 @@
             currentUser = JSON.parse(savedUser);
             updateUserHeaderUI();
         }
+
+        // Retorno (Callback) do Mercado Pago
+        window.addEventListener('load', async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const statusPagamento = urlParams.get('status');
+            const idDoPedido = urlParams.get('external_reference');
+
+            if (statusPagamento === 'approved' && idDoPedido) {
+                try {
+                    const pedidoRef = doc(db, "pedidos", idDoPedido);
+                    await updateDoc(pedidoRef, { status: 'Aprovado (Pago)' });
+                    
+                    showToast("✅ Pagamento confirmado! Seu pedido já está sendo preparado.");
+                    window.history.replaceState(null, '', window.location.pathname);
+                    
+                    if(currentUser) {
+                        setTimeout(() => openLoginModal(), 1500);
+                    }
+                } catch (error) {
+                    console.error("Erro ao atualizar status do pedido via MP:", error);
+                }
+            }
+        });
 
         // Escuta em Tempo Real do Catálogo
         onSnapshot(productsCol, (snapshot) => {
@@ -1056,7 +1042,7 @@
             });
         }
 
-        // --- SISTEMA DE LOGIN DIRETO (GMAIL + PHONE) ---
+        // Login Direto
         const loginForm = document.getElementById('simple-login-form');
         if (loginForm) {
             loginForm.addEventListener('submit', (e) => {
@@ -1082,7 +1068,6 @@
             
             updateUserHeaderUI();
             
-            // Voltar visão do modal para login
             document.getElementById('simple-login-form').style.display = 'block';
             document.getElementById('user-orders-view').style.display = 'none';
             document.getElementById('modal-user-title').textContent = 'Acessar Minha Conta';
@@ -1115,7 +1100,7 @@
             }
         };
 
-        // --- MONITORAMENTO DOS PEDIDOS EM TEMPO REAL ---
+        // Monitoramento dos pedidos
         function renderUserOrdersModal() {
             document.getElementById('simple-login-form').style.display = 'none';
             document.getElementById('user-orders-view').style.display = 'block';
@@ -1127,7 +1112,6 @@
             const ordersContainer = document.getElementById('orders-list-container');
             ordersContainer.innerHTML = `<p style="text-align: center; color: var(--text-dim); padding: 20px; font-size: 0.85rem;">Buscando seus pedidos...</p>`;
 
-            // Escuta pedidos em tempo real onde o cliente é o email do usuário
             if (unsubscribeOrders) unsubscribeOrders();
 
             const q = query(ordersCol, where("cliente.email", "==", currentUser.email));
@@ -1148,13 +1132,12 @@
                     const order = doc.data();
                     const orderId = doc.id.substring(0, 8).toUpperCase();
                     
-                    // Tratamento do Status
                     let rawStatus = (order.status || 'pendente').toLowerCase();
                     let statusLabel = 'PENDENTE';
                     let statusClass = 'pendente';
                     let statusIcon = '⏳';
 
-                    if (rawStatus === 'aprovado' || rawStatus === 'pago' || rawStatus === 'concluido') {
+                    if (rawStatus === 'aprovado' || rawStatus === 'pago' || rawStatus === 'concluido' || rawStatus === 'aprovado (pago)') {
                         statusLabel = 'APROVADO';
                         statusClass = 'aprovado';
                         statusIcon = '✅';
@@ -1164,7 +1147,6 @@
                         statusIcon = '❌';
                     }
 
-                    // Formatando Itens
                     const itemsText = order.items ? order.items.map(i => `${i.qty}x ${i.name} (${i.size})`).join(', ') : 'Itens variados';
                     const totalVal = order.totals ? order.totals.finalTotal : 0;
 
@@ -1260,7 +1242,6 @@
             if (totalEl) totalEl.textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
         }
 
-        // Modais e Checkout
         window.toggleCart = () => {
             const sidebar = document.getElementById('cart-sidebar');
             const overlay = document.getElementById('overlay');
@@ -1278,7 +1259,6 @@
             const totalValEl = document.getElementById('checkout-total-val');
             if (totalValEl) totalValEl.textContent = `R$ ${totalAmount.toFixed(2).replace('.', ',')}`;
 
-            // Auto-preencher dados se estiver logado
             if (currentUser) {
                 document.getElementById('checkout-email').value = currentUser.email;
                 document.getElementById('checkout-whatsapp').value = currentUser.phone;
@@ -1292,7 +1272,7 @@
             updatePaymentInfo();
         };
 
-        // QR Code e PIX
+        // EXIBIÇÃO CONDICIONAL DE PAGAMENTO: Mostra PIX Manual ou Informação MP
         window.updatePaymentInfo = () => {
             const select = document.getElementById('checkout-pagamento');
             const container = document.getElementById('payment-details-container');
@@ -1313,24 +1293,11 @@
                         </div>
                     </div>
                 `;
-            } else if (valor === 'Cartão de Crédito') {
-                container.innerHTML = `
-                    <div style="background: rgba(255, 165, 0, 0.08); border: 1px solid #ff9800; padding: 20px; border-radius: 8px; margin-top: 15px; text-align: center;">
-                        <p style="font-size: 0.85rem; color: #ff9800; font-weight: 800; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">⚠️ Pagamento no Crédito</p>
-                        <p style="font-size: 0.85rem; color: #eee; line-height: 1.5; margin-bottom: 12px;">Aceitamos cartão através do <strong>PIX no Crédito</strong> (Nubank, PicPay, Mercado Pago, etc.).</p>
-                        <hr style="border-color: rgba(255,152,0,0.2); margin: 12px 0;">
-                        <p style="font-size: 0.75rem; color: var(--text-dim); margin-bottom: 8px; text-transform: uppercase;">Use o QR Code abaixo:</p>
-                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(pixKey)}" alt="QR Code PIX Crédito" style="width: 140px; height: 140px; border-radius: 8px; border: 2px solid var(--border); margin-bottom: 12px;">
-                        <div style="display: flex; gap: 8px;">
-                            <input type="text" id="pix-key-input" value="${pixKey}" class="form-control" readonly style="font-size: 0.75rem; background: #000;">
-                            <button type="button" class="btn-header gold-btn" style="white-space: nowrap; padding: 0 15px;" onclick="copiarPix()">Copiar</button>
-                        </div>
-                    </div>
-                `;
             } else {
                 container.innerHTML = `
-                    <div style="background: var(--bg); border: 1px solid var(--border); padding: 15px; border-radius: 8px; margin-top: 15px; text-align: center;">
-                        <p style="font-size: 0.8rem; color: var(--text-dim);">O boleto bancário será enviado para o seu e-mail após a confirmação.</p>
+                    <div style="background: rgba(43, 159, 219, 0.1); border: 1px solid #2b9fdb; padding: 15px; border-radius: 8px; margin-top: 15px; text-align: center;">
+                        <p style="font-size: 0.85rem; color: #2b9fdb; font-weight: 800; margin-bottom: 8px; text-transform: uppercase;">Pagamento Seguro</p>
+                        <p style="font-size: 0.8rem; color: var(--text-dim);">Você será redirecionado para o ambiente seguro do <strong>Mercado Pago</strong> para finalizar sua compra via ${valor}.</p>
                     </div>
                 `;
             }
@@ -1345,7 +1312,6 @@
             }
         };
 
-        // Consulta de CEP
         window.buscarCEP = async () => {
             const cepInput = document.getElementById('checkout-cep');
             if (!cepInput) return;
@@ -1373,19 +1339,27 @@
             }
         };
 
-        // Salvar Pedido no Firestore
+        // SUBMIT DO FORMULÁRIO COM LÓGICA CONDICIONAL
         const checkoutForm = document.getElementById('checkout-form');
         if (checkoutForm) {
             checkoutForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const btn = e.target.querySelector('button[type="submit"]');
-                btn.textContent = "ENVIANDO PEDIDO...";
-                btn.style.opacity = '0.7';
+                const paymentMethod = document.getElementById('checkout-pagamento').value;
+                
+                // Configura botão dependendo se for PIX ou MP
+                if(paymentMethod === 'PIX') {
+                    btn.textContent = "ENVIANDO PEDIDO...";
+                } else {
+                    btn.textContent = "GERANDO LINK SEGURO...";
+                    btn.style.background = "var(--accent)"; 
+                    btn.style.color = "#131110"; 
+                }
+                btn.style.opacity = "1";
 
                 const userEmail = document.getElementById('checkout-email').value.trim().toLowerCase();
                 const userPhone = document.getElementById('checkout-whatsapp').value.trim();
 
-                // Garante que o usuário fique logado após comprar
                 currentUser = { email: userEmail, phone: userPhone };
                 localStorage.setItem('hype_user', JSON.stringify(currentUser));
                 updateUserHeaderUI();
@@ -1400,7 +1374,7 @@
                 }));
 
                 const novoPedido = {
-                    status: "pendente", // Inicia como PENDENTE por padrão
+                    status: "pendente",
                     createdAt: serverTimestamp(),
                     cliente: {
                         nome: document.getElementById('checkout-nome').value,
@@ -1416,7 +1390,7 @@
                         complemento: document.getElementById('checkout-complemento').value || ''
                     },
                     payment: {
-                        method: document.getElementById('checkout-pagamento').value
+                        method: paymentMethod
                     },
                     totals: {
                         finalTotal: totalAmount
@@ -1425,20 +1399,54 @@
                 };
 
                 try {
-                    await addDoc(ordersCol, novoPedido);
-                    showToast('Pedido registrado!');
-                    cart = [];
-                    updateCartUI();
-                    checkoutForm.reset();
-                    closeAllModals();
+                    // Salva no Firebase
+                    const docRef = await addDoc(ordersCol, novoPedido);
                     
-                    // Abre modal de acompanhamento imediatamente
-                    openLoginModal();
+                    if(paymentMethod === 'PIX') {
+                        // LÓGICA PARA PIX (Manual, Sem Mercado Pago)
+                        showToast('Pedido registrado! Realize o pagamento.');
+                        cart = [];
+                        updateCartUI();
+                        checkoutForm.reset();
+                        closeAllModals();
+                        
+                        // Abre a janela de pedidos do cliente em seguida
+                        setTimeout(() => openLoginModal(), 500);
+                        
+                    } else {
+                        // LÓGICA PARA MERCADO PAGO (Cartão, Boleto, etc)
+                        showToast('Aguarde, conectando ao Mercado Pago...');
+                        const response = await fetch('https://api-hype-store.onrender.com/gerar-pagamento', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                titulo: "Pedido Hype Store - #" + docRef.id.substring(0, 8).toUpperCase(),
+                                valor: totalAmount,
+                                email: userEmail,
+                                idPedido: docRef.id
+                            })
+                        });
+
+                        const dadosDoMercadoPago = await response.json();
+
+                        if(dadosDoMercadoPago.init_point) {
+                            cart = [];
+                            updateCartUI();
+                            checkoutForm.reset();
+                            window.location.href = dadosDoMercadoPago.init_point;
+                        } else { 
+                            throw new Error("Link init_point não gerado pela API."); 
+                        }
+                    }
+
                 } catch (error) {
-                    console.error("Erro ao enviar pedido:", error);
-                    showToast('Erro de conexão ao salvar pedido.');
-                } finally {
+                    console.error("Erro no fluxo de checkout:", error);
+                    showToast('Erro ao processar o pedido. Tente novamente.');
+                    
+                    // Restaura o botão
                     btn.textContent = "CONFIRMAR E FINALIZAR PEDIDO";
+                    btn.style.background = ""; 
+                    btn.style.color = "";
                     btn.style.opacity = '1';
                 }
             });
@@ -1489,6 +1497,7 @@
         };
 
         updateCartUI();
+   
     </script>
 </body>
 </html>
