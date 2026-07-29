@@ -977,7 +977,7 @@
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2026 MAGNATA IMPERIUM BRAND. Todos os direitos reservados.</p>
+            <p>&copy; 2026 MAGNATA IMPERIUM BRAND. Todos os direitos reservados. Criado por GT-DEV</p>
         </div>
     </footer>
 
@@ -1152,8 +1152,14 @@ window.scrollToCategory = (categoryKey) => {
 
     if (categoryKey === 'promocoes') {
         targetEl = document.getElementById('promocoes-section-wrapper') || document.getElementById('promocoes-grid');
+    } else if (categoryKey === 'tenis') {
+        const grid = document.getElementById('tenis-grid');
+        targetEl = grid ? (grid.closest('section') || grid) : null;
     } else if (categoryKey === 'blusas' || categoryKey === 'moletons') {
         const grid = document.getElementById('blusas-grid') || document.getElementById('moletons-grid');
+        targetEl = grid ? (grid.closest('section') || grid) : null;
+    } else if (categoryKey === 'chinelos') {
+        const grid = document.getElementById('chinelos-grid');
         targetEl = grid ? (grid.closest('section') || grid) : null;
     } else if (categoryKey === 'perfumes') {
         const grid = document.getElementById('perfumes-grid');
@@ -1165,7 +1171,7 @@ window.scrollToCategory = (categoryKey) => {
     }
 };
 
-// Vincula cliques automaticamente nos banners/imagens pelos textos/alts/classes
+// Vincula cliques automaticamente nos banners/imagens
 function initBannerClicks() {
     const candidateElements = document.querySelectorAll('img, .banner, [class*="banner"], a, div');
 
@@ -1185,14 +1191,37 @@ function initBannerClicks() {
     });
 }
 
-// Extrair tamanhos/MLs do nome de perfumes
-function getPerfumeSizes(title) {
-    if (!title) return ['100ML'];
-    const matches = title.match(/\b(\d+)\s*ml\b/gi);
-    if (matches && matches.length > 0) {
-        return [...new Set(matches.map(m => m.replace(/\s+/g, '').toUpperCase()))];
+// Extrair tamanhos cadastrados no ADM ou gera fallbacks inteligentes
+function getProductSizes(p, category) {
+    let raw = p.tamanhos || p.sizes || p.tamanho || p.size;
+    
+    // Se foi cadastrado no ADM (Array ou String separada por vírgula)
+    if (raw) {
+        if (Array.isArray(raw) && raw.length > 0) {
+            return raw.map(s => String(s).trim()).filter(Boolean);
+        }
+        if (typeof raw === 'string' && raw.trim() !== '') {
+            return raw.split(',').map(s => s.trim()).filter(Boolean);
+        }
     }
-    return ['100ML'];
+
+    // Fallbacks padrão apenas caso o produto antigo não tenha o campo cadastrado
+    if (category === 'perfumes') {
+        const title = p.nome || p.title || '';
+        const matches = title.match(/\b(\d+)\s*ml\b/gi);
+        if (matches && matches.length > 0) {
+            return [...new Set(matches.map(m => m.replace(/\s+/g, '').toUpperCase()))];
+        }
+        return ['100ML'];
+    } 
+    if (category === 'tenis' || category === 'chinelos') {
+        return ['38', '39', '40', '41', '42', '43'];
+    } 
+    if (category === 'bones') {
+        return ['U'];
+    }
+    
+    return ['P', 'M', 'G', 'GG'];
 }
 
 // Injeção de Estilos CSS Dinâmicos
@@ -1418,7 +1447,7 @@ function getPerfumeSizes(title) {
     }
 })();
 
-// Carregar usuário do LocalStorage se existir
+// Carregar usuário do LocalStorage
 const savedUser = localStorage.getItem('hype_user');
 if (savedUser) {
     try {
@@ -1504,6 +1533,52 @@ function setupMaisVendidosDOM() {
     }
 }
 
+// Garante que a seção de TÊNIS fique exatamente ABAIXO das CAMISAS
+function setupTenisDOM() {
+    let grid = document.getElementById('tenis-grid');
+    if (!grid) {
+        const camisasGrid = document.getElementById('camisas-grid');
+        const camisasSection = camisasGrid ? (camisasGrid.closest('section') || camisasGrid.parentElement) : null;
+
+        const tenisWrapper = document.createElement('section');
+        tenisWrapper.className = 'promocoes-wrapper';
+        tenisWrapper.id = 'tenis-section-wrapper';
+        tenisWrapper.innerHTML = `
+            <h2 style="color: #ffffff;">👟 TÊNIS / SNKRS</h2>
+            <div id="tenis-grid" class="promocoes-carousel-grid"></div>
+        `;
+
+        if (camisasSection && camisasSection.parentNode) {
+            camisasSection.parentNode.insertBefore(tenisWrapper, camisasSection.nextSibling);
+        } else {
+            document.body.appendChild(tenisWrapper);
+        }
+    }
+}
+
+// NOVO: Garante que a seção de CHINELOS fique exatamente ABAIXO das BLUSAS / MOLETONS
+function setupChinelosDOM() {
+    let grid = document.getElementById('chinelos-grid');
+    if (!grid) {
+        const blusasGrid = document.getElementById('blusas-grid') || document.getElementById('moletons-grid');
+        const blusasSection = blusasGrid ? (blusasGrid.closest('section') || blusasGrid.parentElement) : null;
+
+        const chinelosWrapper = document.createElement('section');
+        chinelosWrapper.className = 'promocoes-wrapper';
+        chinelosWrapper.id = 'chinelos-section-wrapper';
+        chinelosWrapper.innerHTML = `
+            <h2 style="color: #ffffff;">🩴 CHINELOS / SLIDES</h2>
+            <div id="chinelos-grid" class="promocoes-carousel-grid"></div>
+        `;
+
+        if (blusasSection && blusasSection.parentNode) {
+            blusasSection.parentNode.insertBefore(chinelosWrapper, blusasSection.nextSibling);
+        } else {
+            document.body.appendChild(chinelosWrapper);
+        }
+    }
+}
+
 // Ouvinte em tempo real do banco de dados
 onSnapshot(productsCol, (snapshot) => {
     allProducts = [];
@@ -1516,7 +1591,7 @@ onSnapshot(productsCol, (snapshot) => {
     }
 });
 
-// Helper para criar Card de Produto
+// Helper para criar Card de Produto com Tamanhos Dinâmicos
 function createProductCard(p, category, isMaisSaido) {
     const title = p.nome || p.title || 'Produto HYPE';
     const price = parseFloat(p.preco || p.price || 0);
@@ -1526,28 +1601,16 @@ function createProductCard(p, category, isMaisSaido) {
     const card = document.createElement('div');
     card.className = 'card';
 
-    let sizeOptions = '';
-    
-    if (category === 'perfumes') {
-        const perfumeSizes = getPerfumeSizes(title);
-        if (!selectedSizes[p.id] || !perfumeSizes.includes(selectedSizes[p.id])) {
-            selectedSizes[p.id] = perfumeSizes[0];
-        }
-        sizeOptions = perfumeSizes.map(sz => `
-            <button class="size-btn ${selectedSizes[p.id] === sz ? 'selected' : ''}" onclick="event.stopPropagation(); selectSize('${p.id}', '${sz}', this)">${sz}</button>
-        `).join('');
-    } else if (category === 'bones') {
-        sizeOptions = `<button class="size-btn selected" onclick="event.stopPropagation(); selectSize('${p.id}', 'U', this)">U</button>`;
-        selectedSizes[p.id] = 'U';
-    } else {
-        sizeOptions = `
-            <button class="size-btn ${selectedSizes[p.id] === 'P' ? 'selected' : ''}" onclick="event.stopPropagation(); selectSize('${p.id}', 'P', this)">P</button>
-            <button class="size-btn ${selectedSizes[p.id] === 'M' ? 'selected' : ''}" onclick="event.stopPropagation(); selectSize('${p.id}', 'M', this)">M</button>
-            <button class="size-btn ${selectedSizes[p.id] === 'G' ? 'selected' : ''}" onclick="event.stopPropagation(); selectSize('${p.id}', 'G', this)">G</button>
-            <button class="size-btn ${selectedSizes[p.id] === 'GG' ? 'selected' : ''}" onclick="event.stopPropagation(); selectSize('${p.id}', 'GG', this)">GG</button>
-        `;
-        if (!selectedSizes[p.id]) selectedSizes[p.id] = 'M';
+    // Obtém estritamente os tamanhos cadastrados no ADM
+    const availableSizes = getProductSizes(p, category);
+
+    if (!selectedSizes[p.id] || !availableSizes.includes(selectedSizes[p.id])) {
+        selectedSizes[p.id] = availableSizes[0] || 'Único';
     }
+
+    const sizeOptions = availableSizes.map(sz => `
+        <button class="size-btn ${selectedSizes[p.id] === sz ? 'selected' : ''}" onclick="event.stopPropagation(); selectSize('${p.id}', '${sz}', this)">${sz}</button>
+    `).join('');
 
     let priceDisplayHTML = `<span class="price-tag">R$ ${price.toFixed(2).replace('.', ',')}</span>`;
 
@@ -1587,12 +1650,16 @@ function createProductCard(p, category, isMaisSaido) {
 function renderProducts(products) {
     setupPromocoesDOM();
     setupMaisVendidosDOM();
+    setupTenisDOM();
+    setupChinelosDOM(); // Monta a área de chinelos abaixo das blusas
 
     const grids = {
         'camisas': document.getElementById('camisas-grid'),
+        'tenis': document.getElementById('tenis-grid'),
         'conjuntos': document.getElementById('conjuntos-grid'),
         'promocoes': document.getElementById('promocoes-grid'),
         'moletons': document.getElementById('blusas-grid') || document.getElementById('moletons-grid'),
+        'chinelos': document.getElementById('chinelos-grid'), // Nova categoria Chinelos
         'calcas': document.getElementById('calcas-grid'),
         'perfumes': document.getElementById('perfumes-grid'),
         'bones': document.getElementById('bones-grid'),
@@ -1627,6 +1694,13 @@ function renderProducts(products) {
 
     products.forEach(p => {
         let category = (p.categoria || p.category || '').toLowerCase().trim();
+
+        // Normalização das categorias
+        if (category === 'tênis' || category === 'snkrs' || category === 'sneakers') {
+            category = 'tenis';
+        } else if (category === 'chinelos' || category === 'chinelo' || category === 'slides' || category === 'slide') {
+            category = 'chinelos';
+        }
         
         if (p.promocao === true || p.emPromocao === true || p.promo === true) {
             category = 'promocoes';
@@ -1646,13 +1720,16 @@ function renderProducts(products) {
     });
 }
 
-// Modal de Detalhes
+// Modal de Detalhes do Produto
 window.openProductDetail = (id) => {
     const product = allProducts.find(p => p.id === id);
     if (!product) return;
 
     currentDetailProductId = id;
-    const rawCategory = (product.categoria || product.category || '').toLowerCase().trim();
+    let rawCategory = (product.categoria || product.category || '').toLowerCase().trim();
+    if (rawCategory === 'tênis' || rawCategory === 'snkrs' || rawCategory === 'sneakers') rawCategory = 'tenis';
+    if (rawCategory === 'chinelos' || rawCategory === 'chinelo' || rawCategory === 'slides' || rawCategory === 'slide') rawCategory = 'chinelos';
+
     const title = product.nome || product.title || 'Produto HYPE';
     const price = parseFloat(product.preco || product.price || 0);
     const oldPrice = parseFloat(product.precoAntigo || product.precoOriginal || product.oldPrice || 0);
@@ -1679,26 +1756,23 @@ window.openProductDetail = (id) => {
         `;
     }
 
-    let sizesBtns = '';
-    if (rawCategory === 'perfumes') {
-        const perfumeSizes = getPerfumeSizes(title);
-        if (!selectedSizes[id] || !perfumeSizes.includes(selectedSizes[id])) {
-            selectedSizes[id] = perfumeSizes[0];
-        }
-        sizesBtns = perfumeSizes.map(sz => `
-            <button class="size-btn ${selectedSizes[id] === sz ? 'selected' : ''}" onclick="selectDetailSize('${id}', '${sz}', this)">${sz}</button>
-        `).join('');
-    } else if (rawCategory === 'bones') {
-        selectedSizes[id] = 'U';
-        sizesBtns = `<button class="size-btn selected" onclick="selectDetailSize('${id}', 'U', this)">ÚNICO</button>`;
-    } else {
-        if (!selectedSizes[id]) selectedSizes[id] = 'M';
-        ['P', 'M', 'G', 'GG'].forEach(size => {
-            sizesBtns += `<button class="size-btn ${selectedSizes[id] === size ? 'selected' : ''}" onclick="selectDetailSize('${id}', '${size}', this)">${size}</button>`;
-        });
+    // Exibe estritamente os tamanhos cadastrados via ADM no modal de detalhes
+    const availableSizes = getProductSizes(product, rawCategory);
+    if (!selectedSizes[id] || !availableSizes.includes(selectedSizes[id])) {
+        selectedSizes[id] = availableSizes[0] || 'Único';
     }
 
-    const related = allProducts.filter(p => (p.categoria || p.category) === rawCategory && p.id !== id);
+    const sizesBtns = availableSizes.map(sz => `
+        <button class="size-btn ${selectedSizes[id] === sz ? 'selected' : ''}" onclick="selectDetailSize('${id}', '${sz}', this)">${sz}</button>
+    `).join('');
+
+    const related = allProducts.filter(p => {
+        let cat = (p.categoria || p.category || '').toLowerCase().trim();
+        if (cat === 'tênis' || cat === 'snkrs' || cat === 'sneakers') cat = 'tenis';
+        if (cat === 'chinelos' || cat === 'chinelo' || cat === 'slides' || cat === 'slide') cat = 'chinelos';
+        return cat === rawCategory && p.id !== id;
+    });
+
     let relatedCardsHTML = '';
 
     if (related.length > 0) {
@@ -1918,19 +1992,16 @@ window.addToCart = (id) => {
     const product = allProducts.find(p => p.id === id);
     if (!product) return;
 
-    const category = product.categoria || product.category;
+    let category = (product.categoria || product.category || '').toLowerCase().trim();
+    if (category === 'tênis' || category === 'snkrs' || category === 'sneakers') category = 'tenis';
+    if (category === 'chinelos' || category === 'chinelo' || category === 'slides' || category === 'slide') category = 'chinelos';
+
     const title = product.nome || product.title || 'Produto HYPE';
     const price = parseFloat(product.preco || product.price || 0);
     const img = product.img || product.imagem || product.image || product.foto || '';
 
-    let defaultSize = 'M';
-    if (category === 'perfumes') {
-        defaultSize = getPerfumeSizes(title)[0];
-    } else if (category === 'bones') {
-        defaultSize = 'U';
-    }
-
-    const size = selectedSizes[id] || defaultSize;
+    const availableSizes = getProductSizes(product, category);
+    const size = selectedSizes[id] || availableSizes[0] || 'Único';
 
     const existing = cart.find(item => item.id === id && item.size === size);
 

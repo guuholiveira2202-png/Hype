@@ -78,6 +78,13 @@
         }
         .btn-danger-glass:hover { background: rgba(255, 42, 42, 0.2); box-shadow: 0 0 15px rgba(255, 42, 42, 0.3); color: #fff; }
 
+        .btn-edit-glass {
+            background: rgba(204, 255, 0, 0.05); border: 1px solid rgba(204, 255, 0, 0.3); color: var(--acid-green);
+            padding: 8px 16px; border-radius: 6px; font-weight: 700; cursor: pointer; transition: 0.3s;
+            font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px;
+        }
+        .btn-edit-glass:hover { background: rgba(204, 255, 0, 0.2); box-shadow: var(--acid-glow); color: #fff; }
+
         /* PROFIT TERMINAL */
         .profit-terminal { 
             background: var(--glass-bg); border: 1px solid rgba(204, 255, 0, 0.2); 
@@ -170,11 +177,30 @@
             color: #fff; outline: none; transition: 0.3s;
         }
         .input-box input:focus { border-color: var(--acid-green); box-shadow: inset 0 0 10px rgba(204,255,0,0.1); }
+        
+        /* OPÇÕES DE TAMANHO COM CHECKBOX */
+        .size-options { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 5px; }
+        .size-checkbox { display: none; }
+        .size-label { 
+            background: rgba(0,0,0,0.4); border: 1px solid var(--glass-border); color: var(--text-muted); 
+            padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 700; transition: 0.2s; user-select: none;
+        }
+        .size-label:hover { color: #fff; border-color: rgba(255,255,255,0.2); }
+        .size-checkbox:checked + .size-label { 
+            background: rgba(204, 255, 0, 0.15); border-color: var(--acid-green); color: var(--acid-green); box-shadow: 0 0 10px rgba(204,255,0,0.2);
+        }
+
+        .form-actions { display: flex; gap: 15px; margin-top: 20px; }
         .btn-submit { 
             background: var(--acid-green); color: #000; border: none; padding: 15px; 
-            border-radius: 8px; font-family: var(--font-display); font-weight: 700; cursor: pointer; margin-top: 20px; width: 100%; transition: 0.3s;
+            border-radius: 8px; font-family: var(--font-display); font-weight: 700; cursor: pointer; flex: 1; transition: 0.3s;
         }
         .btn-submit:hover { box-shadow: var(--acid-glow); }
+        .btn-cancel { 
+            background: rgba(255,255,255,0.1); color: #fff; border: 1px solid var(--glass-border); padding: 15px; 
+            border-radius: 8px; font-family: var(--font-display); font-weight: 700; cursor: pointer; display: none; transition: 0.3s;
+        }
+        .btn-cancel:hover { background: rgba(255,255,255,0.2); }
 
         @media (max-width: 1024px) {
             .terminal-grid { grid-template-columns: 1fr 1fr; }
@@ -236,7 +262,7 @@
                     <div class="input-grid">
                         <div class="input-box full">
                             <label>Nome do Item</label>
-                            <input type="text" id="prod-nome" required>
+                            <input type="text" id="prod-nome" required placeholder="Ex: Tênis Nike Air Force / Chinelo Slide / Camisa Oversized">
                         </div>
                         <div class="input-box">
                             <label>Categoria</label>
@@ -245,6 +271,8 @@
                                 <option value="moletons">Moletons</option>
                                 <option value="calcas">Calças</option>
                                 <option value="conjuntos">Conjuntos</option>
+                                <option value="tenis">Tênis</option>
+                                <option value="chinelos">Chinelos</option> <!-- OPÇÃO ADICIONADA -->
                                 <option value="bones">Bonés</option>
                                 <option value="acessorios">Acessórios</option>
                                 <option value="perfumes">Perfumes</option>
@@ -255,21 +283,63 @@
                             <label id="label-preco">Preço Unitário (R$)</label>
                             <input type="number" step="0.01" id="prod-preco" required>
                         </div>
-                        <!-- CAMPO ADICIONADO: Preço Original para Promoções -->
+                        
+                        <!-- PREÇO PROMOCIONAL -->
                         <div class="input-box" id="box-preco-original" style="display: none;">
                             <label>Preço Original / Riscado (R$)</label>
                             <input type="number" step="0.01" id="prod-preco-original">
                         </div>
+
+                        <!-- SELEÇÃO DE TAMANHOS: ROUPAS -->
+                        <div class="input-box full" id="box-tamanhos-roupas">
+                            <label>Tamanhos Disponíveis (Roupas)</label>
+                            <div class="size-options">
+                                <input type="checkbox" id="sz-pp" value="PP" class="size-checkbox"><label for="sz-pp" class="size-label">PP</label>
+                                <input type="checkbox" id="sz-p" value="P" class="size-checkbox"><label for="sz-p" class="size-label">P</label>
+                                <input type="checkbox" id="sz-m" value="M" class="size-checkbox"><label for="sz-m" class="size-label">M</label>
+                                <input type="checkbox" id="sz-g" value="G" class="size-checkbox"><label for="sz-g" class="size-label">G</label>
+                                <input type="checkbox" id="sz-gg" value="GG" class="size-checkbox"><label for="sz-gg" class="size-label">GG</label>
+                                <input type="checkbox" id="sz-xg" value="XG" class="size-checkbox"><label for="sz-xg" class="size-label">XG</label>
+                            </div>
+                        </div>
+
+                        <!-- SELEÇÃO DE TAMANHOS: CALÇADOS (TÊNIS E CHINELOS) -->
+                        <div class="input-box full" id="box-tamanhos-calcados" style="display: none;">
+                            <label>Tamanhos Disponíveis (Calçados / Tênis / Chinelos)</label>
+                            <div class="size-options">
+                                <!-- TAMANHOS DUPLOS (COMUNS EM CHINELOS) -->
+                                <input type="checkbox" id="sz-3536" value="35/36" class="size-checkbox"><label for="sz-3536" class="size-label">35/36</label>
+                                <input type="checkbox" id="sz-3738" value="37/38" class="size-checkbox"><label for="sz-3738" class="size-label">37/38</label>
+                                <input type="checkbox" id="sz-3940" value="39/40" class="size-checkbox"><label for="sz-3940" class="size-label">39/40</label>
+                                <input type="checkbox" id="sz-4142" value="41/42" class="size-checkbox"><label for="sz-4142" class="size-label">41/42</label>
+                                <input type="checkbox" id="sz-4344" value="43/44" class="size-checkbox"><label for="sz-4344" class="size-label">43/44</label>
+
+                                <!-- TAMANHOS INDIVIDUAIS -->
+                                <input type="checkbox" id="sz-37" value="37" class="size-checkbox"><label for="sz-37" class="size-label">37</label>
+                                <input type="checkbox" id="sz-38" value="38" class="size-checkbox"><label for="sz-38" class="size-label">38</label>
+                                <input type="checkbox" id="sz-39" value="39" class="size-checkbox"><label for="sz-39" class="size-label">39</label>
+                                <input type="checkbox" id="sz-40" value="40" class="size-checkbox"><label for="sz-40" class="size-label">40</label>
+                                <input type="checkbox" id="sz-41" value="41" class="size-checkbox"><label for="sz-41" class="size-label">41</label>
+                                <input type="checkbox" id="sz-42" value="42" class="size-checkbox"><label for="sz-42" class="size-label">42</label>
+                                <input type="checkbox" id="sz-43" value="43" class="size-checkbox"><label for="sz-43" class="size-label">43</label>
+                                <input type="checkbox" id="sz-44" value="44" class="size-checkbox"><label for="sz-44" class="size-label">44</label>
+                            </div>
+                        </div>
+
                         <div class="input-box full">
                             <label>Imagem Source URL</label>
                             <input type="url" id="prod-img" required>
                         </div>
                     </div>
-                    <button type="submit" class="btn-submit" id="btn-submit">CADASTRAR PRODUTO</button>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-submit" id="btn-submit">CADASTRAR PRODUTO</button>
+                        <button type="button" class="btn-cancel" id="btn-cancelar" onclick="cancelarEdicao()">CANCELAR EDIÇÃO</button>
+                    </div>
                 </form>
             </div>
 
-            <div id="product-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px;"></div>
+            <div id="product-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px;"></div>
         </section>
 
     </main>
@@ -291,6 +361,10 @@
         const db = firebase.firestore();
 
         const formatCurrency = (v) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+        // Cache local de produtos para preenchimento no Editar
+        window.produtosCache = {};
+        let editandoId = null;
 
         // NAVEGAÇÃO
         document.querySelectorAll('.nav-btn').forEach(btn => {
@@ -484,16 +558,21 @@
             }
         }
 
-        // ================= LÓGICA DE PRODUTOS =================
+        // ================= LÓGICA DE PRODUTOS & EDITAR =================
         const formProd = document.getElementById('form-produto');
         const catSelect = document.getElementById('prod-categoria');
         const boxPrecoOriginal = document.getElementById('box-preco-original');
+        const boxTamanhosRoupas = document.getElementById('box-tamanhos-roupas');
+        const boxTamanhosCalcados = document.getElementById('box-tamanhos-calcados');
         const labelPreco = document.getElementById('label-preco');
         const inputPrecoOriginal = document.getElementById('prod-preco-original');
 
-        // Alterna dinamicamente a exibição do campo "Preço Original" ao alterar a Categoria
-        catSelect.addEventListener('change', () => {
-            if (catSelect.value === 'promocoes') {
+        // Alterna campos visíveis dependendo da Categoria
+        function atualizarVisibilidadeCampos() {
+            const cat = catSelect.value;
+
+            // Preço Promocional
+            if (cat === 'promocoes') {
                 boxPrecoOriginal.style.display = 'flex';
                 inputPrecoOriginal.required = true;
                 labelPreco.textContent = 'Preço Promocional (R$)';
@@ -503,16 +582,47 @@
                 inputPrecoOriginal.value = '';
                 labelPreco.textContent = 'Preço Unitário (R$)';
             }
-        });
 
+            // Exibição dos Tamanhos (Tênis e Chinelos agora usam o painel de Calçados)
+            if (['tenis', 'chinelos'].includes(cat)) {
+                boxTamanhosCalcados.style.display = 'flex';
+                boxTamanhosRoupas.style.display = 'none';
+            } else if (['camisas', 'moletons', 'calcas', 'conjuntos'].includes(cat)) {
+                boxTamanhosRoupas.style.display = 'flex';
+                boxTamanhosCalcados.style.display = 'none';
+            } else if (cat === 'promocoes') {
+                boxTamanhosRoupas.style.display = 'flex';
+                boxTamanhosCalcados.style.display = 'flex';
+            } else {
+                boxTamanhosRoupas.style.display = 'none';
+                boxTamanhosCalcados.style.display = 'none';
+            }
+        }
+
+        catSelect.addEventListener('change', atualizarVisibilidadeCampos);
+
+        // Captura tamanhos marcados de caixas visíveis
+        function getTamanhosSelecionados() {
+            const selecionados = [];
+            document.querySelectorAll('.size-checkbox:checked').forEach(cb => {
+                const parentBox = cb.closest('.input-box');
+                if (parentBox && parentBox.style.display !== 'none') {
+                    selecionados.push(cb.value);
+                }
+            });
+            return selecionados;
+        }
+
+        // Submeter formulário (Cadastrar ou Atualizar)
         formProd.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const btn = document.getElementById('btn-submit');
-            btn.textContent = "PROCESSANDO...";
+            const btnSubmit = document.getElementById('btn-submit');
+            btnSubmit.textContent = "PROCESSANDO...";
 
             const precoVal = parseFloat(document.getElementById('prod-preco').value);
             const precoOriginalVal = inputPrecoOriginal.value ? parseFloat(inputPrecoOriginal.value) : null;
             const categoriaVal = catSelect.value;
+            const tamanhosVal = getTamanhosSelecionados();
 
             try {
                 const produtoData = {
@@ -520,60 +630,122 @@
                     preco: precoVal,
                     img: document.getElementById('prod-img').value,
                     categoria: categoriaVal,
-                    criadoEm: firebase.firestore.FieldValue.serverTimestamp()
+                    tamanhos: tamanhosVal
                 };
 
-                // Se a categoria for promoções e houver preço original, salva ambos os valores
                 if (categoriaVal === 'promocoes' && precoOriginalVal) {
                     produtoData.precoOriginal = precoOriginalVal;
                 }
 
-                await db.collection("produtos").add(produtoData);
-                
-                formProd.reset();
-                boxPrecoOriginal.style.display = 'none';
-                labelPreco.textContent = 'Preço Unitário (R$)';
+                if (editandoId) {
+                    // MODO ATUALIZAÇÃO
+                    produtoData.atualizadoEm = firebase.firestore.FieldValue.serverTimestamp();
+                    await db.collection("produtos").doc(editandoId).update(produtoData);
+                    alert("Produto atualizado com sucesso!");
+                    cancelarEdicao();
+                } else {
+                    // MODO NOVO CADASTRO
+                    produtoData.criadoEm = firebase.firestore.FieldValue.serverTimestamp();
+                    await db.collection("produtos").add(produtoData);
+                    alert("Produto cadastrado com sucesso!");
+                    cancelarEdicao();
+                }
             } catch (error) {
                 console.error(error);
-                alert("Erro ao cadastrar produto.");
+                alert("Erro ao salvar produto.");
             } finally {
-                btn.textContent = "CADASTRAR PRODUTO";
+                btnSubmit.textContent = editandoId ? "SALVAR ALTERAÇÕES" : "CADASTRAR PRODUTO";
             }
         });
 
+        // Carregar produtos em tempo real
         db.collection("produtos").orderBy("criadoEm", "desc").onSnapshot(snap => {
             const list = document.getElementById('product-list');
             list.innerHTML = "";
+            window.produtosCache = {};
+
             snap.forEach(doc => {
                 const p = doc.data();
+                window.produtosCache[doc.id] = p;
 
-                // Formatação do Preço (Exibe valor riscado se for uma Promoção)
-                let precoHtml = `<div style="color:var(--acid-green); font-family:var(--font-display); font-size:1rem; margin-bottom:15px;">${formatCurrency(p.preco || 0)}</div>`;
+                let precoHtml = `<div style="color:var(--acid-green); font-family:var(--font-display); font-size:1rem; margin-bottom:10px;">${formatCurrency(p.preco || 0)}</div>`;
                 
                 if (p.categoria === 'promocoes' && p.precoOriginal) {
                     precoHtml = `
-                        <div style="font-family:var(--font-display); margin-bottom:15px; display:flex; align-items:baseline; gap:8px;">
+                        <div style="font-family:var(--font-display); margin-bottom:10px; display:flex; align-items:baseline; gap:8px;">
                             <span style="text-decoration: line-through; color: var(--text-muted); font-size: 0.8rem;">${formatCurrency(p.precoOriginal)}</span>
                             <span style="color:var(--acid-green); font-size:1rem;">${formatCurrency(p.preco || 0)}</span>
                         </div>
                     `;
                 }
 
+                const tamanhosTxt = (p.tamanhos && p.tamanhos.length > 0) 
+                    ? p.tamanhos.join(', ') 
+                    : 'Sem tamanhos';
+
                 list.innerHTML += `
-                    <div style="background:var(--glass-bg); padding:15px; border-radius:12px; border:1px solid var(--glass-border);">
-                        <img src="${p.img}" style="width:100%; aspect-ratio:1; object-fit:cover; border-radius:8px; margin-bottom:12px; border:1px solid rgba(255,255,255,0.05);">
-                        <h4 style="font-size:0.85rem; margin-bottom:2px; color:#fff;">${p.nome}</h4>
-                        <span style="font-size:0.7rem; color:var(--text-muted); text-transform:uppercase; display:block; margin-bottom:8px;">Categoria: ${p.categoria || 'N/A'}</span>
-                        ${precoHtml}
-                        <button onclick="deleteProd('${doc.id}')" class="btn-danger-glass" style="width:100%;">Excluir</button>
+                    <div style="background:var(--glass-bg); padding:15px; border-radius:12px; border:1px solid var(--glass-border); display:flex; flex-direction:column; justify-content:space-between;">
+                        <div>
+                            <img src="${p.img}" style="width:100%; aspect-ratio:1; object-fit:cover; border-radius:8px; margin-bottom:12px; border:1px solid rgba(255,255,255,0.05);">
+                            <h4 style="font-size:0.85rem; margin-bottom:4px; color:#fff;">${p.nome}</h4>
+                            <span style="font-size:0.7rem; color:var(--text-muted); text-transform:uppercase; display:block; margin-bottom:4px;">Cat: ${p.categoria || 'N/A'}</span>
+                            <span style="font-size:0.7rem; color:var(--acid-green); display:block; margin-bottom:10px;">Tam: ${tamanhosTxt}</span>
+                            ${precoHtml}
+                        </div>
+                        <div style="display:flex; flex-direction:column; gap:8px;">
+                            <button onclick="editProd('${doc.id}')" class="btn-edit-glass" style="width:100%;">Editar</button>
+                            <button onclick="deleteProd('${doc.id}')" class="btn-danger-glass" style="width:100%;">Excluir</button>
+                        </div>
                     </div>
                 `;
             });
         });
 
-        async function deleteProd(id) {
-            if(confirm("Remover item do banco de dados?")) await db.collection("produtos").doc(id).delete();
+        // Preenche formulário para Editar
+        function editProd(id) {
+            const p = window.produtosCache[id];
+            if (!p) return;
+
+            editandoId = id;
+            document.getElementById('prod-nome').value = p.nome || '';
+            document.getElementById('prod-categoria').value = p.categoria || 'camisas';
+            document.getElementById('prod-preco').value = p.preco || '';
+            document.getElementById('prod-preco-original').value = p.precoOriginal || '';
+            document.getElementById('prod-img').value = p.img || '';
+
+            atualizarVisibilidadeCampos();
+
+            // Desmarca todos e depois marca os selecionados do produto
+            document.querySelectorAll('.size-checkbox').forEach(cb => {
+                cb.checked = p.tamanhos ? p.tamanhos.includes(cb.value) : false;
+            });
+
+            document.getElementById('btn-submit').textContent = "SALVAR ALTERAÇÕES";
+            document.getElementById('btn-cancelar').style.display = "block";
+            
+            // Rola suavemente até o formulário
+            document.getElementById('form-produto').scrollIntoView({ behavior: 'smooth' });
         }
+
+        // Cancelar Edição
+        function cancelarEdicao() {
+            editandoId = null;
+            formProd.reset();
+            atualizarVisibilidadeCampos();
+            document.querySelectorAll('.size-checkbox').forEach(cb => cb.checked = false);
+            document.getElementById('btn-submit').textContent = "CADASTRAR PRODUTO";
+            document.getElementById('btn-cancelar').style.display = "none";
+        }
+
+        async function deleteProd(id) {
+            if(confirm("Remover item do banco de dados?")) {
+                await db.collection("produtos").doc(id).delete();
+                if (editandoId === id) cancelarEdicao();
+            }
+        }
+
+        // Inicializa estado inicial do formulário
+        atualizarVisibilidadeCampos();
     </script>
 </body>
 </html>
