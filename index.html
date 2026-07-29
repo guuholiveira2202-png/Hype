@@ -10,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@500;700;800&display=swap" rel="stylesheet">
 
-    <style>
+   <style>
         /* --- DESIGN SYSTEM & VARIÁVEIS --- */
         :root {
             --bg: #08080a;
@@ -271,10 +271,10 @@
             box-shadow: 0 6px 24px var(--accent-glow);
         }
 
-        /* --- CARROSSEL DE PROMOÇÕES --- */
+        /* --- CARROSSEL DE PROMOÇÕES (EXTRA GRANDE) --- */
         .promo-carousel-wrapper {
             width: 100%;
-            max-width: 1050px;
+            max-width: 1400px; /* Expandido para acomodar os novos banners grandes */
             margin-top: 45px;
             position: relative;
             animation: fadeIn 1.4s ease forwards;
@@ -305,10 +305,10 @@
 
         .promo-carousel {
             display: flex;
-            gap: 16px;
+            gap: 24px;
             overflow-x: auto;
             scroll-snap-type: x mandatory;
-            padding: 6px 4px 16px 4px;
+            padding: 8px 4px 20px 4px;
             scrollbar-width: none;
             -webkit-overflow-scrolling: touch;
             cursor: grab;
@@ -318,10 +318,10 @@
         .promo-carousel:active { cursor: grabbing; }
 
         .promo-card {
-            flex: 0 0 340px;
-            height: 130px;
+            flex: 0 0 600px; /* Largura significativamente maior */
+            height: 280px;    /* Altura maior tipo Banner */
             scroll-snap-align: center;
-            border-radius: var(--radius-md);
+            border-radius: var(--radius-lg);
             overflow: hidden;
             position: relative;
             border: 1px solid var(--border-subtle);
@@ -331,9 +331,9 @@
         }
 
         .promo-card:hover {
-            transform: translateY(-3px);
+            transform: translateY(-5px);
             border-color: var(--border-accent);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8);
         }
 
         .promo-card img {
@@ -346,15 +346,15 @@
         }
 
         .promo-card:hover img {
-            transform: scale(1.06);
+            transform: scale(1.05);
             filter: brightness(0.75);
         }
 
         .promo-content {
             position: absolute;
             inset: 0;
-            padding: 16px 20px;
-            background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(8,8,10,0.9) 100%);
+            padding: 28px 32px;
+            background: linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(8,8,10,0.92) 100%);
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
@@ -365,29 +365,29 @@
         .promo-tag {
             background: var(--accent);
             color: #000;
-            font-size: 0.58rem;
+            font-size: 0.68rem;
             font-weight: 800;
-            padding: 3px 9px;
+            padding: 5px 12px;
             border-radius: var(--radius-full);
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin-bottom: 6px;
+            margin-bottom: 10px;
         }
 
         .promo-title {
             color: var(--text-primary);
             font-family: 'Syne', sans-serif;
-            font-size: 1rem;
+            font-size: 1.35rem;
             font-weight: 800;
-            line-height: 1.15;
+            line-height: 1.2;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
         .promo-subtitle {
             color: var(--text-secondary);
-            font-size: 0.72rem;
-            margin-top: 2px;
+            font-size: 0.88rem;
+            margin-top: 4px;
             font-weight: 400;
         }
 
@@ -469,7 +469,7 @@
         /* Imagem de produto menor */
         .card-img {
             width: 100%;
-            height: 160px; /* Reduzido de 220px para imagens menores */
+            height: 160px;
             position: relative;
             background: var(--bg-subtle);
             overflow: hidden;
@@ -772,10 +772,15 @@
             .btn-header { padding: 8px 14px; font-size: 0.68rem; }
             .quick-nav { justify-content: flex-start; max-width: 95%; top: 75px; padding: 6px 10px; }
             .quick-select-btn { font-size: 0.68rem; padding: 6px 14px; }
-            .promo-card { flex: 0 0 280px; height: 115px; }
+            
+            /* Ajustado também no celular para ficar bem amplo */
+            .promo-card { flex: 0 0 85vw; height: 210px; } 
+            .promo-content { padding: 20px; }
+            .promo-title { font-size: 1.1rem; }
+            
             .category-section { padding: 60px 4%; }
             .grid { gap: 10px; }
-            .card-img { height: 130px; } /* Ajuste de imagem para mobile */
+            .card-img { height: 130px; }
             .card-info { padding: 10px; }
             .modal-center { padding: 20px; width: 94%; }
         }
@@ -810,14 +815,16 @@
     <!-- Hero Section -->
     <section id="hero">
         <h1>Magnata <span>Imperium</span></h1>
-        <p>A redefinição do streetwear nacional. Cortes impecáveis, matérias-primas rigorosamente selecionadas e silhuetas que ditam as regras.</p>
+        <p>A MAGNATA IMPERIUM🦅 chegou. <br> <br>
+            Aqui vai ter camisa de time, peças das melhores marcas, conjuntos, sport fino e muito mais. Sempre trazendo qualidade, estilo e aquele atendimento que faz você querer voltar.
+        </p>
         <a href="#camisas" class="hero-btn">Explorar Catálogo</a>
 
         <!-- CARROSSEL DE PROMOÇÕES -->
         <div class="promo-carousel-wrapper">
             <div class="promo-carousel-header">
                 <span>Destaques & Ofertas Exclusivas</span>
-                <small>← Arraste para o lado →</small>
+                <small></small>
             </div>
             <div class="promo-carousel">
                 <!-- Promoção 1 -->
