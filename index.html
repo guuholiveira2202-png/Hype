@@ -1111,7 +1111,7 @@
 
 
 
-<!-- Script Principal: Firebase, Catálogo, Login Direto & Status do Pedido em Tempo Real -->
+<!-- Script Principal: Firebase, Catálogo, Promoções em Carrossel, Login, Carrinho & Checkout -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp, query, where, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -1147,10 +1147,10 @@
         if (matches && matches.length > 0) {
             return [...new Set(matches.map(m => m.replace(/\s+/g, '').toUpperCase()))];
         }
-        return ['100ML']; // Padrão se nada for especificado no nome
+        return ['100ML'];
     }
 
-    // Injeção dos Estilos Refinados da Tela Interna de Produto e Carrossel
+    // Injeção de Estilos: Tela Interna, Carrossel & Seção Promoções Reduzida
     (function injectProductDetailStyles() {
         const style = document.createElement('style');
         style.innerHTML = `
@@ -1160,7 +1160,7 @@
             }
 
             #toast {
-                z-index: 100000 !important; /* Garante visibilidade no topo de tudo */
+                z-index: 100000 !important;
             }
 
             .product-detail-view {
@@ -1289,6 +1289,73 @@
             .carousel-card h4 { font-size: 0.88rem; font-weight: 700; margin: 0 0 6px 0; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #f4f4f5; }
 
             .carousel-card span { font-size: 0.95rem; color: var(--accent, #d4af37); font-weight: 800; }
+
+            /* --- ESTILOS DA SEÇÃO DE PROMOÇÕES --- */
+            .promocoes-wrapper {
+                margin: 40px auto;
+                max-width: 1100px;
+                padding: 0 15px;
+            }
+
+            .promocoes-wrapper h2 {
+                font-size: 1.2rem;
+                font-weight: 800;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                margin-bottom: 16px;
+                color: #ff3b30;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .promocoes-carousel-grid {
+                display: flex !important;
+                gap: 12px !important;
+                overflow-x: auto !important;
+                scroll-snap-type: x mandatory;
+                padding: 10px 4px 20px 4px !important;
+                -webkit-overflow-scrolling: touch;
+                grid-template-columns: unset !important;
+            }
+
+            .promocoes-carousel-grid::-webkit-scrollbar { height: 4px; }
+            .promocoes-carousel-grid::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
+            .promocoes-carousel-grid::-webkit-scrollbar-thumb { background: #ff3b30; border-radius: 4px; }
+
+            .promocoes-carousel-grid .card {
+                flex: 0 0 165px !important;
+                max-width: 165px !important;
+                min-width: 165px !important;
+                scroll-snap-align: start;
+                padding: 10px !important;
+            }
+
+            .promocoes-carousel-grid .card .card-img {
+                height: 150px !important;
+            }
+
+            .promocoes-carousel-grid .card h3 {
+                font-size: 0.78rem !important;
+                margin-bottom: 6px !important;
+            }
+
+            .promocoes-carousel-grid .card .price-tag {
+                font-size: 0.85rem !important;
+            }
+
+            .promocoes-carousel-grid .card .size-btn {
+                font-size: 0.65rem !important;
+                padding: 2px 5px !important;
+                min-width: unset !important;
+                height: auto !important;
+            }
+
+            .promocoes-carousel-grid .card .add-btn {
+                font-size: 0.7rem !important;
+                padding: 8px 4px !important;
+                margin-top: 6px !important;
+            }
         `;
         document.head.appendChild(style);
 
@@ -1300,14 +1367,14 @@
         }
     })();
 
-    // Tentar carregar login salvo no LocalStorage
+    // Tentar carregar login salvo
     const savedUser = localStorage.getItem('hype_user');
     if (savedUser) {
         currentUser = JSON.parse(savedUser);
         updateUserHeaderUI();
     }
 
-    // Retorno (Callback) do Mercado Pago
+    // Retorno (Callback) Mercado Pago
     window.addEventListener('load', async () => {
         const urlParams = new URLSearchParams(window.location.search);
         const statusPagamento = urlParams.get('status');
@@ -1330,7 +1397,34 @@
         }
     });
 
-    // Escuta em Tempo Real do Catálogo
+    // Inserção dinâmica da Seção de Promoções logo abaixo de Conjuntos (ficando abaixo de Camisas e Conjuntos)
+    function setupPromocoesDOM() {
+        let promoGrid = document.getElementById('promocoes-grid');
+        if (!promoGrid) {
+            const camisasGrid = document.getElementById('camisas-grid');
+            const conjuntosGrid = document.getElementById('conjuntos-grid');
+            
+            // Prioriza inserir logo após a seção de Conjuntos (que vem depois de Camisas)
+            const referenceEl = (conjuntosGrid ? conjuntosGrid.closest('section') || conjuntosGrid.parentElement : null)
+                             || (camisasGrid ? camisasGrid.closest('section') || camisasGrid.parentElement : null);
+
+            const promoWrapper = document.createElement('section');
+            promoWrapper.className = 'promocoes-wrapper';
+            promoWrapper.id = 'promocoes-section-wrapper';
+            promoWrapper.innerHTML = `
+                <h2>🔥 PROMOÇÕES IMPERDÍVEIS</h2>
+                <div id="promocoes-grid" class="promocoes-carousel-grid"></div>
+            `;
+
+            if (referenceEl && referenceEl.parentNode) {
+                referenceEl.parentNode.insertBefore(promoWrapper, referenceEl.nextSibling);
+            } else {
+                document.body.appendChild(promoWrapper);
+            }
+        }
+    }
+
+    // Escuta em Tempo Real do Catálogo Firebase
     onSnapshot(productsCol, (snapshot) => {
         allProducts = [];
         snapshot.forEach(doc => allProducts.push({ id: doc.id, ...doc.data() }));
@@ -1342,11 +1436,14 @@
     });
 
     function renderProducts(products) {
+        setupPromocoesDOM();
+
         const grids = {
             'camisas': document.getElementById('camisas-grid'),
+            'conjuntos': document.getElementById('conjuntos-grid'),
+            'promocoes': document.getElementById('promocoes-grid'),
             'moletons': document.getElementById('blusas-grid') || document.getElementById('moletons-grid'),
             'calcas': document.getElementById('calcas-grid'),
-            'conjuntos': document.getElementById('conjuntos-grid'),
             'perfumes': document.getElementById('perfumes-grid'),
             'bones': document.getElementById('bones-grid')
         };
@@ -1354,9 +1451,14 @@
         Object.values(grids).forEach(grid => { if (grid) grid.innerHTML = ''; });
 
         products.forEach(p => {
-            const category = p.categoria || p.category;
+            let category = (p.categoria || p.category || '').toLowerCase();
+            if (p.promocao === true || p.emPromocao === true || p.promo === true) {
+                category = 'promocoes';
+            }
+
             const title = p.nome || p.title || 'Produto HYPE';
             const price = parseFloat(p.preco || p.price || 0);
+            const oldPrice = parseFloat(p.precoAntigo || p.precoOriginal || p.oldPrice || 0);
             const img = p.img || p.imagem || p.image || p.foto || 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=800&q=80';
 
             if (!grids[category]) return;
@@ -1378,7 +1480,6 @@
                 sizeOptions = `<button class="size-btn selected" onclick="event.stopPropagation(); selectSize('${p.id}', 'U')">U</button>`;
                 selectedSizes[p.id] = 'U';
             } else {
-                // Camisas e demais vestuários
                 sizeOptions = `
                     <button class="size-btn ${selectedSizes[p.id] === 'P' ? 'selected' : ''}" onclick="event.stopPropagation(); selectSize('${p.id}', 'P')">P</button>
                     <button class="size-btn ${selectedSizes[p.id] === 'M' ? 'selected' : ''}" onclick="event.stopPropagation(); selectSize('${p.id}', 'M')">M</button>
@@ -1388,15 +1489,28 @@
                 if (!selectedSizes[p.id]) selectedSizes[p.id] = 'M';
             }
 
+            // Exibição do Preço (com valor riscado se estiver em promoção ou tiver preço antigo)
+            let priceDisplayHTML = `<span class="price-tag">R$ ${price.toFixed(2).replace('.', ',')}</span>`;
+
+            if (category === 'promocoes' || oldPrice > price) {
+                const displayOldPrice = oldPrice > price ? oldPrice : (price * 1.25);
+                priceDisplayHTML = `
+                    <div style="display: flex; flex-direction: column; align-items: flex-start; line-height: 1.1;">
+                        <span style="text-decoration: line-through; color: var(--text-dim, #888); font-size: 0.72rem; font-weight: 500;">R$ ${displayOldPrice.toFixed(2).replace('.', ',')}</span>
+                        <span class="price-tag" style="color: #ff3b30; font-weight: 800;">R$ ${price.toFixed(2).replace('.', ',')}</span>
+                    </div>
+                `;
+            }
+
             card.innerHTML = `
-                <span class="badge-vip">NEW</span>
+                <span class="badge-vip">${category === 'promocoes' ? 'OFF' : 'NEW'}</span>
                 <div class="card-img" onclick="openProductDetail('${p.id}')" style="cursor:pointer;">
                     <img src="${img}" alt="${title}" loading="lazy">
                 </div>
                 <div class="card-info">
                     <h3 onclick="openProductDetail('${p.id}')" style="cursor:pointer;">${title}</h3>
                     <div class="card-meta-row">
-                        <span class="price-tag">R$ ${price.toFixed(2).replace('.', ',')}</span>
+                        ${priceDisplayHTML}
                         <div class="sizes">${sizeOptions}</div>
                     </div>
                     <button class="add-btn" onclick="event.stopPropagation(); addToCart('${p.id}')">ADICIONAR À BAG</button>
@@ -1413,7 +1527,7 @@
         });
     }
 
-    // ABRIR PÁGINA INDIVIDUAL DO PRODUTO
+    // Tela de Produto Detalhada
     window.openProductDetail = (id) => {
         const product = allProducts.find(p => p.id === id);
         if (!product) return;
@@ -1422,10 +1536,23 @@
         const category = product.categoria || product.category;
         const title = product.nome || product.title || 'Produto HYPE';
         const price = parseFloat(product.preco || product.price || 0);
+        const oldPrice = parseFloat(product.precoAntigo || product.precoOriginal || product.oldPrice || 0);
+        const isPromo = (product.promocao === true || product.emPromocao === true || product.promo === true || category === 'promocoes');
         const img = product.img || product.imagem || product.image || product.foto || 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=800&q=80';
 
         const numParcelas = 10;
         const valorParcela = (price / numParcelas).toFixed(2).replace('.', ',');
+
+        let detailPriceHTML = `<span class="detail-price">R$ ${price.toFixed(2).replace('.', ',')}</span>`;
+        if (isPromo || oldPrice > price) {
+            const displayOldPrice = oldPrice > price ? oldPrice : (price * 1.25);
+            detailPriceHTML = `
+                <div style="display: flex; align-items: baseline; gap: 10px;">
+                    <span style="text-decoration: line-through; color: var(--text-dim, #888); font-size: 1.3rem; font-weight: 500;">R$ ${displayOldPrice.toFixed(2).replace('.', ',')}</span>
+                    <span class="detail-price" style="color: #ff3b30;">R$ ${price.toFixed(2).replace('.', ',')}</span>
+                </div>
+            `;
+        }
 
         let sizesBtns = '';
         if (category === 'perfumes') {
@@ -1482,7 +1609,7 @@
                 <div class="detail-info">
                     <h2>${title}</h2>
                     <div class="detail-price-box">
-                        <span class="detail-price">R$ ${price.toFixed(2).replace('.', ',')}</span>
+                        ${detailPriceHTML}
                         <span class="detail-installments">💳 até <strong>${numParcelas}x de R$ ${valorParcela}</strong> sem juros</span>
                     </div>
 
@@ -1515,7 +1642,6 @@
         if (detailContainer) detailContainer.classList.remove('active');
     };
 
-    // Seleção exata e sem conflitos de tamanho na tela detalhada
     window.selectDetailSize = (id, size, btnElement) => {
         selectedSizes[id] = size;
         const container = document.getElementById('detail-sizes-row');
@@ -1585,7 +1711,7 @@
         }
     };
 
-    // Monitoramento dos pedidos
+    // Monitoramento dos Pedidos
     function renderUserOrdersModal() {
         document.getElementById('simple-login-form').style.display = 'none';
         document.getElementById('user-orders-view').style.display = 'block';
@@ -1766,7 +1892,7 @@
         updatePaymentInfo();
     };
 
-    // EXIBIÇÃO CONDICIONAL DE PAGAMENTO
+    // Pagamento Condicional
     window.updatePaymentInfo = () => {
         const select = document.getElementById('checkout-pagamento');
         const container = document.getElementById('payment-details-container');
@@ -1833,7 +1959,7 @@
         }
     };
 
-    // SUBMIT DO FORMULÁRIO COM LÓGICA CONDICIONAL
+    // Submissão do Formulário de Checkout
     const checkoutForm = document.getElementById('checkout-form');
     if (checkoutForm) {
         checkoutForm.addEventListener('submit', async (e) => {
@@ -1985,6 +2111,5 @@
 
     updateCartUI();
 </script>
-
 </body>
 </html>

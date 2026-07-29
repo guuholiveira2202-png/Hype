@@ -130,7 +130,7 @@
         .status-badge.rejeitado { color: var(--red-alert); background: rgba(255, 42, 42, 0.05); }
 
         .terminal-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.03); }
-        .grid-cell label { display: block; font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 5px; display: flex; align-items: center; gap: 5px; }
+        .grid-cell label { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 5px; display: flex; align-items: center; gap: 5px; }
         .grid-cell .main-data { font-size: 0.9rem; font-weight: 600; color: #fff; }
         .grid-cell .email-data { font-size: 0.8rem; color: var(--text-main); margin-top: 2px; word-break: break-all; }
         .grid-cell .sub-data { font-size: 0.75rem; color: var(--acid-green); margin-top: 3px; }
@@ -239,10 +239,6 @@
                             <input type="text" id="prod-nome" required>
                         </div>
                         <div class="input-box">
-                            <label>Preço Unitário (R$)</label>
-                            <input type="number" step="0.01" id="prod-preco" required>
-                        </div>
-                        <div class="input-box">
                             <label>Categoria</label>
                             <select id="prod-categoria" required>
                                 <option value="camisas">Camisas</option>
@@ -254,6 +250,15 @@
                                 <option value="perfumes">Perfumes</option>
                                 <option value="promocoes">Promoções</option>
                             </select>
+                        </div>
+                        <div class="input-box">
+                            <label id="label-preco">Preço Unitário (R$)</label>
+                            <input type="number" step="0.01" id="prod-preco" required>
+                        </div>
+                        <!-- CAMPO ADICIONADO: Preço Original para Promoções -->
+                        <div class="input-box" id="box-preco-original" style="display: none;">
+                            <label>Preço Original / Riscado (R$)</label>
+                            <input type="number" step="0.01" id="prod-preco-original">
                         </div>
                         <div class="input-box full">
                             <label>Imagem Source URL</label>
@@ -481,19 +486,53 @@
 
         // ================= LÓGICA DE PRODUTOS =================
         const formProd = document.getElementById('form-produto');
+        const catSelect = document.getElementById('prod-categoria');
+        const boxPrecoOriginal = document.getElementById('box-preco-original');
+        const labelPreco = document.getElementById('label-preco');
+        const inputPrecoOriginal = document.getElementById('prod-preco-original');
+
+        // Alterna dinamicamente a exibição do campo "Preço Original" ao alterar a Categoria
+        catSelect.addEventListener('change', () => {
+            if (catSelect.value === 'promocoes') {
+                boxPrecoOriginal.style.display = 'flex';
+                inputPrecoOriginal.required = true;
+                labelPreco.textContent = 'Preço Promocional (R$)';
+            } else {
+                boxPrecoOriginal.style.display = 'none';
+                inputPrecoOriginal.required = false;
+                inputPrecoOriginal.value = '';
+                labelPreco.textContent = 'Preço Unitário (R$)';
+            }
+        });
+
         formProd.addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('btn-submit');
             btn.textContent = "PROCESSANDO...";
+
+            const precoVal = parseFloat(document.getElementById('prod-preco').value);
+            const precoOriginalVal = inputPrecoOriginal.value ? parseFloat(inputPrecoOriginal.value) : null;
+            const categoriaVal = catSelect.value;
+
             try {
-                await db.collection("produtos").add({
+                const produtoData = {
                     nome: document.getElementById('prod-nome').value,
-                    preco: parseFloat(document.getElementById('prod-preco').value),
+                    preco: precoVal,
                     img: document.getElementById('prod-img').value,
-                    categoria: document.getElementById('prod-categoria').value,
+                    categoria: categoriaVal,
                     criadoEm: firebase.firestore.FieldValue.serverTimestamp()
-                });
+                };
+
+                // Se a categoria for promoções e houver preço original, salva ambos os valores
+                if (categoriaVal === 'promocoes' && precoOriginalVal) {
+                    produtoData.precoOriginal = precoOriginalVal;
+                }
+
+                await db.collection("produtos").add(produtoData);
+                
                 formProd.reset();
+                boxPrecoOriginal.style.display = 'none';
+                labelPreco.textContent = 'Preço Unitário (R$)';
             } catch (error) {
                 console.error(error);
                 alert("Erro ao cadastrar produto.");
@@ -507,12 +546,25 @@
             list.innerHTML = "";
             snap.forEach(doc => {
                 const p = doc.data();
+
+                // Formatação do Preço (Exibe valor riscado se for uma Promoção)
+                let precoHtml = `<div style="color:var(--acid-green); font-family:var(--font-display); font-size:1rem; margin-bottom:15px;">${formatCurrency(p.preco || 0)}</div>`;
+                
+                if (p.categoria === 'promocoes' && p.precoOriginal) {
+                    precoHtml = `
+                        <div style="font-family:var(--font-display); margin-bottom:15px; display:flex; align-items:baseline; gap:8px;">
+                            <span style="text-decoration: line-through; color: var(--text-muted); font-size: 0.8rem;">${formatCurrency(p.precoOriginal)}</span>
+                            <span style="color:var(--acid-green); font-size:1rem;">${formatCurrency(p.preco || 0)}</span>
+                        </div>
+                    `;
+                }
+
                 list.innerHTML += `
                     <div style="background:var(--glass-bg); padding:15px; border-radius:12px; border:1px solid var(--glass-border);">
                         <img src="${p.img}" style="width:100%; aspect-ratio:1; object-fit:cover; border-radius:8px; margin-bottom:12px; border:1px solid rgba(255,255,255,0.05);">
                         <h4 style="font-size:0.85rem; margin-bottom:2px; color:#fff;">${p.nome}</h4>
                         <span style="font-size:0.7rem; color:var(--text-muted); text-transform:uppercase; display:block; margin-bottom:8px;">Categoria: ${p.categoria || 'N/A'}</span>
-                        <div style="color:var(--acid-green); font-family:var(--font-display); font-size:1rem; margin-bottom:15px;">${formatCurrency(p.preco || 0)}</div>
+                        ${precoHtml}
                         <button onclick="deleteProd('${doc.id}')" class="btn-danger-glass" style="width:100%;">Excluir</button>
                     </div>
                 `;
