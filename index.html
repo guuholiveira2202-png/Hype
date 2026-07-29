@@ -271,7 +271,7 @@
             box-shadow: 0 6px 24px var(--accent-glow);
         }
 
-        /* --- CARROSSEL DE PROMOÇÕES (IMAGENS PEQUENAS, LARGAS E ARRASTÁVEIS) --- */
+        /* --- CARROSSEL DE PROMOÇÕES --- */
         .promo-carousel-wrapper {
             width: 100%;
             max-width: 1050px;
@@ -318,8 +318,8 @@
         .promo-carousel:active { cursor: grabbing; }
 
         .promo-card {
-            flex: 0 0 340px; /* Card com formato horizontal (largo) */
-            height: 130px;   /* Altura pequena */
+            flex: 0 0 340px;
+            height: 130px;
             scroll-snap-align: center;
             border-radius: var(--radius-md);
             overflow: hidden;
@@ -391,7 +391,7 @@
             font-weight: 400;
         }
 
-        /* --- CATEGORIAS & GRIDS --- */
+        /* --- CATEGORIAS & GRIDS (ORGANIZADO DE 2 EM 2) --- */
         .category-section { 
             padding: 80px 6%; 
             scroll-margin-top: 130px;
@@ -421,12 +421,12 @@
             letter-spacing: 0;
         }
 
-        /* Grid Flexível de Produtos */
+        /* Grid de Produtos: Forçado 2 colunas */
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-            gap: 24px;
-            max-width: 1200px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            max-width: 800px;
             margin: 0 auto;
         }
 
@@ -451,24 +451,25 @@
 
         .badge-vip {
             position: absolute;
-            top: 12px;
-            left: 12px;
+            top: 8px;
+            left: 8px;
             background: rgba(8, 8, 10, 0.85);
             backdrop-filter: blur(8px);
             border: 1px solid var(--border-accent);
             color: var(--accent);
-            font-size: 0.6rem;
+            font-size: 0.55rem;
             font-weight: 800;
-            padding: 4px 10px;
+            padding: 3px 8px;
             z-index: 2;
             letter-spacing: 1px;
             text-transform: uppercase;
             border-radius: var(--radius-full);
         }
 
+        /* Imagem de produto menor */
         .card-img {
             width: 100%;
-            height: 220px;
+            height: 160px; /* Reduzido de 220px para imagens menores */
             position: relative;
             background: var(--bg-subtle);
             overflow: hidden;
@@ -485,33 +486,33 @@
         .card:hover .card-img img { transform: scale(1.06); }
 
         .card-info { 
-            padding: 18px; 
+            padding: 12px; 
             display: flex; 
             flex-direction: column; 
             flex-grow: 1; 
-            gap: 10px;
+            gap: 8px;
         }
         
         .card-info h3 { 
-            font-size: 0.88rem; 
+            font-size: 0.82rem; 
             font-weight: 600; 
             color: var(--text-primary); 
             letter-spacing: 0.2px; 
-            line-height: 1.35;
+            line-height: 1.3;
         }
 
         .card-meta-row { 
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            gap: 8px;
+            gap: 6px;
             margin-top: 2px;
         }
         
         .price-tag { 
             font-family: 'Syne', sans-serif; 
             font-weight: 700; 
-            font-size: 1.05rem; 
+            font-size: 0.95rem; 
             color: var(--accent); 
         }
 
@@ -521,9 +522,9 @@
             background: transparent;
             border: 1px solid var(--border-subtle);
             color: var(--text-secondary);
-            width: 28px;
-            height: 28px;
-            font-size: 0.68rem;
+            width: 24px;
+            height: 24px;
+            font-size: 0.62rem;
             font-weight: 600;
             cursor: pointer;
             transition: var(--transition-fast);
@@ -538,18 +539,18 @@
 
         .add-btn {
             width: 100%;
-            padding: 11px;
+            padding: 9px;
             background: rgba(255, 255, 255, 0.03);
             color: var(--text-primary);
             border: 1px solid var(--border-subtle);
-            font-size: 0.68rem;
+            font-size: 0.65rem;
             font-weight: 700;
             letter-spacing: 1px;
             cursor: pointer;
             text-transform: uppercase;
             transition: var(--transition-fast);
             border-radius: var(--radius-sm);
-            margin-top: 6px;
+            margin-top: 4px;
         }
 
         .add-btn:hover { 
@@ -771,11 +772,11 @@
             .btn-header { padding: 8px 14px; font-size: 0.68rem; }
             .quick-nav { justify-content: flex-start; max-width: 95%; top: 75px; padding: 6px 10px; }
             .quick-select-btn { font-size: 0.68rem; padding: 6px 14px; }
-            .promo-card { flex: 0 0 280px; height: 115px; } /* Ajuste de proporção para mobile */
-            .category-section { padding: 60px 5%; }
-            .grid { gap: 16px; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
-            .card-img { height: 180px; }
-            .card-info { padding: 14px; }
+            .promo-card { flex: 0 0 280px; height: 115px; }
+            .category-section { padding: 60px 4%; }
+            .grid { gap: 10px; }
+            .card-img { height: 130px; } /* Ajuste de imagem para mobile */
+            .card-info { padding: 10px; }
             .modal-center { padding: 20px; width: 94%; }
         }
     </style>
@@ -812,7 +813,7 @@
         <p>A redefinição do streetwear nacional. Cortes impecáveis, matérias-primas rigorosamente selecionadas e silhuetas que ditam as regras.</p>
         <a href="#camisas" class="hero-btn">Explorar Catálogo</a>
 
-        <!-- NOVO: CARROSSEL DE PROMOÇÕES (3 BANNERS LARGOS E ARRASTÁVEIS) -->
+        <!-- CARROSSEL DE PROMOÇÕES -->
         <div class="promo-carousel-wrapper">
             <div class="promo-carousel-header">
                 <span>Destaques & Ofertas Exclusivas</span>
@@ -852,64 +853,64 @@
         </div>
     </section>
 
-    <!-- Seções de Produtos -->
+    <!-- Seções de Produtos (Grid de 2 em 2) -->
     <section id="camisas" class="category-section">
         <h2 class="category-title">Camisas <span>Oversized & Tees</span></h2>
         <div class="grid" id="camisas-grid">
-            <div class="card skeleton" style="height: 310px;"></div>
-            <div class="card skeleton" style="height: 310px;"></div>
-            <div class="card skeleton" style="height: 310px;"></div>
-            <div class="card skeleton" style="height: 310px;"></div>
+            <div class="card skeleton" style="height: 250px;"></div>
+            <div class="card skeleton" style="height: 250px;"></div>
+            <div class="card skeleton" style="height: 250px;"></div>
+            <div class="card skeleton" style="height: 250px;"></div>
         </div>
     </section>
 
     <section id="blusas" class="category-section">
         <h2 class="category-title">Blusas <span>Hoodies & Sweaters</span></h2>
         <div class="grid" id="blusas-grid">
-            <div class="card skeleton" style="height: 310px;"></div>
-            <div class="card skeleton" style="height: 310px;"></div>
-            <div class="card skeleton" style="height: 310px;"></div>
-            <div class="card skeleton" style="height: 310px;"></div>
+            <div class="card skeleton" style="height: 250px;"></div>
+            <div class="card skeleton" style="height: 250px;"></div>
+            <div class="card skeleton" style="height: 250px;"></div>
+            <div class="card skeleton" style="height: 250px;"></div>
         </div>
     </section>
 
     <section id="calcas" class="category-section">
         <h2 class="category-title">Calças <span>Cargos & Parachutes</span></h2>
         <div class="grid" id="calcas-grid">
-            <div class="card skeleton" style="height: 310px;"></div>
-            <div class="card skeleton" style="height: 310px;"></div>
-            <div class="card skeleton" style="height: 310px;"></div>
-            <div class="card skeleton" style="height: 310px;"></div>
+            <div class="card skeleton" style="height: 250px;"></div>
+            <div class="card skeleton" style="height: 250px;"></div>
+            <div class="card skeleton" style="height: 250px;"></div>
+            <div class="card skeleton" style="height: 250px;"></div>
         </div>
     </section>
 
     <section id="conjuntos" class="category-section">
         <h2 class="category-title">Conjuntos <span>Full Fits</span></h2>
         <div class="grid" id="conjuntos-grid">
-            <div class="card skeleton" style="height: 310px;"></div>
-            <div class="card skeleton" style="height: 310px;"></div>
-            <div class="card skeleton" style="height: 310px;"></div>
-            <div class="card skeleton" style="height: 310px;"></div>
+            <div class="card skeleton" style="height: 250px;"></div>
+            <div class="card skeleton" style="height: 250px;"></div>
+            <div class="card skeleton" style="height: 250px;"></div>
+            <div class="card skeleton" style="height: 250px;"></div>
         </div>
     </section>
 
     <section id="perfumes" class="category-section">
         <h2 class="category-title">Perfumes <span>Essências Exclusivas</span></h2>
         <div class="grid" id="perfumes-grid">
-            <div class="card skeleton" style="height: 310px;"></div>
-            <div class="card skeleton" style="height: 310px;"></div>
-            <div class="card skeleton" style="height: 310px;"></div>
-            <div class="card skeleton" style="height: 310px;"></div>
+            <div class="card skeleton" style="height: 250px;"></div>
+            <div class="card skeleton" style="height: 250px;"></div>
+            <div class="card skeleton" style="height: 250px;"></div>
+            <div class="card skeleton" style="height: 250px;"></div>
         </div>
     </section>
 
     <section id="bones" class="category-section">
         <h2 class="category-title">Bonés <span>Headwear Premium</span></h2>
         <div class="grid" id="bones-grid">
-            <div class="card skeleton" style="height: 310px;"></div>
-            <div class="card skeleton" style="height: 310px;"></div>
-            <div class="card skeleton" style="height: 310px;"></div>
-            <div class="card skeleton" style="height: 310px;"></div>
+            <div class="card skeleton" style="height: 250px;"></div>
+            <div class="card skeleton" style="height: 250px;"></div>
+            <div class="card skeleton" style="height: 250px;"></div>
+            <div class="card skeleton" style="height: 250px;"></div>
         </div>
     </section>
 
@@ -1110,8 +1111,7 @@
 
 
 
-
-  <!-- Script Principal: Firebase, Catálogo, Login Direto & Status do Pedido em Tempo Real -->
+<!-- Script Principal: Firebase, Catálogo, Login Direto & Status do Pedido em Tempo Real -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp, query, where, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -1140,6 +1140,16 @@
     const productsCol = collection(db, "produtos");
     const ordersCol = collection(db, "pedidos");
 
+    // Função auxiliar para extrair MLs do nome do perfume
+    function getPerfumeSizes(title) {
+        if (!title) return ['100ML'];
+        const matches = title.match(/\b(\d+)\s*ml\b/gi);
+        if (matches && matches.length > 0) {
+            return [...new Set(matches.map(m => m.replace(/\s+/g, '').toUpperCase()))];
+        }
+        return ['100ML']; // Padrão se nada for especificado no nome
+    }
+
     // Injeção dos Estilos Refinados da Tela Interna de Produto e Carrossel
     (function injectProductDetailStyles() {
         const style = document.createElement('style');
@@ -1147,6 +1157,10 @@
             @keyframes fadeInDetail {
                 from { opacity: 0; transform: translateY(15px); }
                 to { opacity: 1; transform: translateY(0); }
+            }
+
+            #toast {
+                z-index: 100000 !important; /* Garante visibilidade no topo de tudo */
             }
 
             .product-detail-view {
@@ -1232,6 +1246,7 @@
                 border: 1px solid var(--border, rgba(255,255,255,0.2));
                 background: rgba(255,255,255,0.04); color: #fff;
                 font-weight: 700; font-size: 0.85rem; cursor: pointer; transition: all 0.2s ease;
+                padding: 0 12px;
             }
 
             .detail-sizes-row .size-btn:hover { border-color: var(--accent, #d4af37); background: rgba(212,175,55,0.1); }
@@ -1277,7 +1292,6 @@
         `;
         document.head.appendChild(style);
 
-        // Injeta contêiner no HTML caso não exista
         if (!document.getElementById('product-detail-view')) {
             const detailView = document.createElement('div');
             detailView.id = 'product-detail-view';
@@ -1351,16 +1365,20 @@
             card.className = 'card';
 
             let sizeOptions = '';
+            
             if (category === 'perfumes') {
-                sizeOptions = `
-                    <button class="size-btn ${selectedSizes[p.id] === '50ML' ? 'selected' : ''}" onclick="event.stopPropagation(); selectSize('${p.id}', '50ML')">50</button>
-                    <button class="size-btn ${selectedSizes[p.id] === '100ML' ? 'selected' : ''}" onclick="event.stopPropagation(); selectSize('${p.id}', '100ML')">100</button>
-                `;
-                if (!selectedSizes[p.id]) selectedSizes[p.id] = '100ML';
+                const perfumeSizes = getPerfumeSizes(title);
+                if (!selectedSizes[p.id] || !perfumeSizes.includes(selectedSizes[p.id])) {
+                    selectedSizes[p.id] = perfumeSizes[0];
+                }
+                sizeOptions = perfumeSizes.map(sz => `
+                    <button class="size-btn ${selectedSizes[p.id] === sz ? 'selected' : ''}" onclick="event.stopPropagation(); selectSize('${p.id}', '${sz}')">${sz}</button>
+                `).join('');
             } else if (category === 'bones') {
                 sizeOptions = `<button class="size-btn selected" onclick="event.stopPropagation(); selectSize('${p.id}', 'U')">U</button>`;
                 selectedSizes[p.id] = 'U';
             } else {
+                // Camisas e demais vestuários
                 sizeOptions = `
                     <button class="size-btn ${selectedSizes[p.id] === 'P' ? 'selected' : ''}" onclick="event.stopPropagation(); selectSize('${p.id}', 'P')">P</button>
                     <button class="size-btn ${selectedSizes[p.id] === 'M' ? 'selected' : ''}" onclick="event.stopPropagation(); selectSize('${p.id}', 'M')">M</button>
@@ -1409,21 +1427,22 @@
         const numParcelas = 10;
         const valorParcela = (price / numParcelas).toFixed(2).replace('.', ',');
 
-        if (!selectedSizes[id]) {
-            selectedSizes[id] = category === 'perfumes' ? '100ML' : (category === 'bones' ? 'U' : 'M');
-        }
-
         let sizesBtns = '';
         if (category === 'perfumes') {
-            sizesBtns = `
-                <button class="size-btn ${selectedSizes[id] === '50ML' ? 'selected' : ''}" onclick="selectDetailSize('${id}', '50ML')">50 ML</button>
-                <button class="size-btn ${selectedSizes[id] === '100ML' ? 'selected' : ''}" onclick="selectDetailSize('${id}', '100ML')">100 ML</button>
-            `;
+            const perfumeSizes = getPerfumeSizes(title);
+            if (!selectedSizes[id] || !perfumeSizes.includes(selectedSizes[id])) {
+                selectedSizes[id] = perfumeSizes[0];
+            }
+            sizesBtns = perfumeSizes.map(sz => `
+                <button class="size-btn ${selectedSizes[id] === sz ? 'selected' : ''}" onclick="selectDetailSize('${id}', '${sz}', this)">${sz}</button>
+            `).join('');
         } else if (category === 'bones') {
-            sizesBtns = `<button class="size-btn selected" onclick="selectDetailSize('${id}', 'U')">ÚNICO</button>`;
+            selectedSizes[id] = 'U';
+            sizesBtns = `<button class="size-btn selected" onclick="selectDetailSize('${id}', 'U', this)">ÚNICO</button>`;
         } else {
+            if (!selectedSizes[id]) selectedSizes[id] = 'M';
             ['P', 'M', 'G', 'GG'].forEach(size => {
-                sizesBtns += `<button class="size-btn ${selectedSizes[id] === size ? 'selected' : ''}" onclick="selectDetailSize('${id}', '${size}')">${size}</button>`;
+                sizesBtns += `<button class="size-btn ${selectedSizes[id] === size ? 'selected' : ''}" onclick="selectDetailSize('${id}', '${size}', this)">${size}</button>`;
             });
         }
 
@@ -1496,17 +1515,15 @@
         if (detailContainer) detailContainer.classList.remove('active');
     };
 
-    window.selectDetailSize = (id, size) => {
+    // Seleção exata e sem conflitos de tamanho na tela detalhada
+    window.selectDetailSize = (id, size, btnElement) => {
         selectedSizes[id] = size;
         const container = document.getElementById('detail-sizes-row');
         if (container) {
-            container.querySelectorAll('.size-btn').forEach(btn => {
-                if (btn.textContent.includes(size) || btn.textContent.trim() === size) {
-                    btn.classList.add('selected');
-                } else {
-                    btn.classList.remove('selected');
-                }
-            });
+            container.querySelectorAll('.size-btn').forEach(b => b.classList.remove('selected'));
+        }
+        if (btnElement) {
+            btnElement.classList.add('selected');
         }
     };
 
@@ -1655,10 +1672,19 @@
         const product = allProducts.find(p => p.id === id);
         if (!product) return;
 
+        const category = product.categoria || product.category;
         const title = product.nome || product.title || 'Produto HYPE';
         const price = parseFloat(product.preco || product.price || 0);
         const img = product.img || product.imagem || product.image || product.foto || '';
-        const size = selectedSizes[id] || 'M';
+
+        let defaultSize = 'M';
+        if (category === 'perfumes') {
+            defaultSize = getPerfumeSizes(title)[0];
+        } else if (category === 'bones') {
+            defaultSize = 'U';
+        }
+
+        const size = selectedSizes[id] || defaultSize;
 
         const existing = cart.find(item => item.id === id && item.size === size);
 
@@ -1666,7 +1692,7 @@
         else cart.push({ id, title, price, img, size, qty: 1 });
 
         updateCartUI();
-        showToast(`${title} na bag!`);
+        showToast(`✅ ${title} (${size}) adicionado à bag!`);
     };
 
     window.removeFromCart = (index) => {
@@ -1950,6 +1976,7 @@
     window.showToast = (msg) => {
         const toast = document.getElementById('toast');
         if (toast) {
+            toast.style.zIndex = '100000';
             toast.textContent = msg;
             toast.classList.add('show');
             setTimeout(() => toast.classList.remove('show'), 3000);

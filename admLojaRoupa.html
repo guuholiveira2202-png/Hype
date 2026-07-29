@@ -10,7 +10,7 @@
     <style>
         :root {
             --bg-deep: #020404;
-            --glass-bg: rgba(12, 16, 16, 0.7);
+            --glass-bg: rgba(12, 13, 16, 0.7);
             --glass-border: rgba(255, 255, 255, 0.08);
             --acid-green: #ccff00;
             --acid-glow: 0 0 15px rgba(204, 255, 0, 0.3);
@@ -248,6 +248,7 @@
                                 <option value="camisas">Camisas</option>
                                 <option value="moletons">Moletons</option>
                                 <option value="calcas">Calças</option>
+                                <option value="conjuntos">Conjuntos</option>
                                 <option value="bones">Bonés</option>
                                 <option value="acessorios">Acessórios</option>
                                 <option value="perfumes">Perfumes</option>
@@ -365,7 +366,7 @@
                             </div>
                         </div>
                         <div style="display:flex; align-items:center; gap: 20px;">
-                            <div class="qty-badge">1</div>
+                            <div class="qty-badge">${item.quantity || 1}</div>
                             <div class="item-price">${formatCurrency(item.price || 0)}</div>
                         </div>
                     </div>
@@ -509,7 +510,8 @@
                 list.innerHTML += `
                     <div style="background:var(--glass-bg); padding:15px; border-radius:12px; border:1px solid var(--glass-border);">
                         <img src="${p.img}" style="width:100%; aspect-ratio:1; object-fit:cover; border-radius:8px; margin-bottom:12px; border:1px solid rgba(255,255,255,0.05);">
-                        <h4 style="font-size:0.85rem; margin-bottom:5px; color:#fff;">${p.nome}</h4>
+                        <h4 style="font-size:0.85rem; margin-bottom:2px; color:#fff;">${p.nome}</h4>
+                        <span style="font-size:0.7rem; color:var(--text-muted); text-transform:uppercase; display:block; margin-bottom:8px;">Categoria: ${p.categoria || 'N/A'}</span>
                         <div style="color:var(--acid-green); font-family:var(--font-display); font-size:1rem; margin-bottom:15px;">${formatCurrency(p.preco || 0)}</div>
                         <button onclick="deleteProd('${doc.id}')" class="btn-danger-glass" style="width:100%;">Excluir</button>
                     </div>
