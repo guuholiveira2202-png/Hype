@@ -1116,8 +1116,7 @@
         <div class="support-content" id="support-content"></div>
     </div>
 
-
-<!-- Script Principal: Firebase, Catálogo, Promoções em Carrossel, Login, Carrinho & Checkout -->
+<!-- Script Principal: Firebase, Catálogo, Promoções, Login, Carrinho & Checkout -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp, query, where, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -1146,14 +1145,54 @@ let currentDetailProductId = null;
 const productsCol = collection(db, "produtos");
 const ordersCol = collection(db, "pedidos");
 
+// Normalização padronizada de categorias
+function normalizeCategory(rawCategory) {
+    let category = (rawCategory || '').toLowerCase().trim();
+    
+    if (category === 'tênis' || category === 'snkrs' || category === 'sneakers') {
+        return 'tenis';
+    } 
+    if (category === 'chinelos' || category === 'chinelo' || category === 'slides' || category === 'slide') {
+        return 'chinelos';
+    } 
+    if (category.includes('time') || category.includes('futebol') || category === 'camisa de time' || category === 'camisas de time' || category === 'camisas-time') {
+        return 'camisas-time';
+    } 
+    if (category.includes('cargo') || category === 'calça cargo' || category === 'calca cargo' || category === 'calcas-cargo') {
+        return 'calcas-cargo';
+    }
+    if (category.includes('alfaiataria') || category === 'calça de alfaiataria' || category === 'calca de alfaiataria' || category === 'calcas-alfaiataria') {
+        return 'calcas-alfaiataria';
+    }
+    if (category.includes('agasalho') || category.includes('jaqueta') || category === 'agasalhos') {
+        return 'agasalhos';
+    }
+    
+    return category;
+}
+
 // Navegação/Rolagem suave para as seções dos banners
 window.scrollToCategory = (categoryKey) => {
     let targetEl = null;
 
     if (categoryKey === 'promocoes') {
         targetEl = document.getElementById('promocoes-section-wrapper') || document.getElementById('promocoes-grid');
+    } else if (categoryKey === 'mais-vendidos') {
+        targetEl = document.getElementById('mais-vendidos-section-wrapper') || document.getElementById('mais-vendidos-grid');
     } else if (categoryKey === 'tenis') {
         const grid = document.getElementById('tenis-grid');
+        targetEl = grid ? (grid.closest('section') || grid) : null;
+    } else if (categoryKey === 'camisas-time') {
+        const grid = document.getElementById('camisas-time-grid');
+        targetEl = grid ? (grid.closest('section') || grid) : null;
+    } else if (categoryKey === 'calcas-cargo') {
+        const grid = document.getElementById('calcas-cargo-grid');
+        targetEl = grid ? (grid.closest('section') || grid) : null;
+    } else if (categoryKey === 'calcas-alfaiataria') {
+        const grid = document.getElementById('calcas-alfaiataria-grid');
+        targetEl = grid ? (grid.closest('section') || grid) : null;
+    } else if (categoryKey === 'agasalhos') {
+        const grid = document.getElementById('agasalhos-grid');
         targetEl = grid ? (grid.closest('section') || grid) : null;
     } else if (categoryKey === 'blusas' || categoryKey === 'moletons') {
         const grid = document.getElementById('blusas-grid') || document.getElementById('moletons-grid');
@@ -1195,7 +1234,6 @@ function initBannerClicks() {
 function getProductSizes(p, category) {
     let raw = p.tamanhos || p.sizes || p.tamanho || p.size;
     
-    // Se foi cadastrado no ADM (Array ou String separada por vírgula)
     if (raw) {
         if (Array.isArray(raw) && raw.length > 0) {
             return raw.map(s => String(s).trim()).filter(Boolean);
@@ -1205,7 +1243,6 @@ function getProductSizes(p, category) {
         }
     }
 
-    // Fallbacks padrão apenas caso o produto antigo não tenha o campo cadastrado
     if (category === 'perfumes') {
         const title = p.nome || p.title || '';
         const matches = title.match(/\b(\d+)\s*ml\b/gi);
@@ -1436,6 +1473,28 @@ function getProductSizes(p, category) {
             padding: 8px 4px !important;
             margin-top: 6px !important;
         }
+
+        /* Grade 2 por 2 para Camisas de Time igual às camisas */
+        .camisas-time-grid-2col {
+            display: grid !important;
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 12px !important;
+            padding: 10px 0 !important;
+        }
+
+        @media (min-width: 768px) {
+            .camisas-time-grid-2col {
+                grid-template-columns: repeat(4, 1fr) !important;
+                gap: 20px !important;
+            }
+        }
+
+        .camisas-time-grid-2col .card {
+            flex: unset !important;
+            max-width: 100% !important;
+            min-width: unset !important;
+            width: 100% !important;
+        }
     `;
     document.head.appendChild(style);
 
@@ -1509,7 +1568,7 @@ function setupPromocoesDOM() {
     }
 }
 
-// Garante que o container de Mais Vendidos exista no HTML
+// Garante que o container de MAIS VENDIDOS fique exatamente EM CIMA das CAMISAS
 function setupMaisVendidosDOM() {
     let grid = document.getElementById('mais-vendidos-grid') || 
                document.getElementById('mais-vendidos') || 
@@ -1517,7 +1576,9 @@ function setupMaisVendidosDOM() {
                document.getElementById('mais-saidos-grid');
                
     if (!grid) {
-        const referenceEl = document.getElementById('camisas-grid') || document.querySelector('section');
+        const camisasGrid = document.getElementById('camisas-grid');
+        const camisasSection = camisasGrid ? (camisasGrid.closest('section') || camisasGrid.parentElement) : document.querySelector('section');
+
         const wrapper = document.createElement('section');
         wrapper.className = 'promocoes-wrapper';
         wrapper.id = 'mais-vendidos-section-wrapper';
@@ -1525,20 +1586,21 @@ function setupMaisVendidosDOM() {
             <h2 style="color: #ff9500;">🔥 MAIS VENDIDOS</h2>
             <div id="mais-vendidos-grid" class="promocoes-carousel-grid"></div>
         `;
-        if (referenceEl && referenceEl.parentNode) {
-            referenceEl.parentNode.insertBefore(wrapper, referenceEl);
+
+        if (camisasSection && camisasSection.parentNode) {
+            camisasSection.parentNode.insertBefore(wrapper, camisasSection); // Inserido ANTES/ACIMA de Camisas
         } else {
             document.body.appendChild(wrapper);
         }
     }
 }
 
-// Garante que a seção de TÊNIS fique exatamente ABAIXO das CAMISAS
+// Garante que a seção de TÊNIS fique exatamente ABAIXO das CAMISAS DE TIME
 function setupTenisDOM() {
     let grid = document.getElementById('tenis-grid');
     if (!grid) {
-        const camisasGrid = document.getElementById('camisas-grid');
-        const camisasSection = camisasGrid ? (camisasGrid.closest('section') || camisasGrid.parentElement) : null;
+        const camisasTimeGrid = document.getElementById('camisas-time-grid') || document.getElementById('camisas-grid');
+        const referenceSection = camisasTimeGrid ? (camisasTimeGrid.closest('section') || camisasTimeGrid.parentElement) : null;
 
         const tenisWrapper = document.createElement('section');
         tenisWrapper.className = 'promocoes-wrapper';
@@ -1548,15 +1610,107 @@ function setupTenisDOM() {
             <div id="tenis-grid" class="promocoes-carousel-grid"></div>
         `;
 
-        if (camisasSection && camisasSection.parentNode) {
-            camisasSection.parentNode.insertBefore(tenisWrapper, camisasSection.nextSibling);
+        if (referenceSection && referenceSection.parentNode) {
+            referenceSection.parentNode.insertBefore(tenisWrapper, referenceSection.nextSibling);
         } else {
             document.body.appendChild(tenisWrapper);
         }
     }
 }
 
-// NOVO: Garante que a seção de CHINELOS fique exatamente ABAIXO das BLUSAS / MOLETONS
+// Garante que a seção de CAMISAS DE TIME fique de 2 EM 2 (igual Camisas)
+function setupCamisasTimeDOM() {
+    let grid = document.getElementById('camisas-time-grid');
+    if (!grid) {
+        const camisasGrid = document.getElementById('camisas-grid');
+        const camisasSection = camisasGrid ? (camisasGrid.closest('section') || camisasGrid.parentElement) : null;
+
+        const wrapper = document.createElement('section');
+        wrapper.className = 'promocoes-wrapper';
+        wrapper.id = 'camisas-time-section-wrapper';
+        wrapper.innerHTML = `
+            <h2 style="color: #ffffff;">⚽ CAMISAS DE TIME</h2>
+            <div id="camisas-time-grid" class="camisas-time-grid-2col"></div>
+        `;
+
+        if (camisasSection && camisasSection.parentNode) {
+            camisasSection.parentNode.insertBefore(wrapper, camisasSection.nextSibling);
+        } else {
+            document.body.appendChild(wrapper);
+        }
+    }
+}
+
+// Seção de AGASALHOS (posicionada abaixo de Blusas/Moletons)
+function setupAgasalhosDOM() {
+    let grid = document.getElementById('agasalhos-grid');
+    if (!grid) {
+        const moletonsGrid = document.getElementById('blusas-grid') || document.getElementById('moletons-grid');
+        const moletonsSection = moletonsGrid ? (moletonsGrid.closest('section') || moletonsGrid.parentElement) : null;
+
+        const wrapper = document.createElement('section');
+        wrapper.className = 'promocoes-wrapper';
+        wrapper.id = 'agasalhos-section-wrapper';
+        wrapper.innerHTML = `
+            <h2 style="color: #ffffff;">🧥 AGASALHOS</h2>
+            <div id="agasalhos-grid" class="promocoes-carousel-grid"></div>
+        `;
+
+        if (moletonsSection && moletonsSection.parentNode) {
+            moletonsSection.parentNode.insertBefore(wrapper, moletonsSection.nextSibling);
+        } else {
+            document.body.appendChild(wrapper);
+        }
+    }
+}
+
+// Seção de CALÇA DE ALFAIATARIA (posicionada abaixo de Calças Cargo/Calças)
+function setupCalcasAlfaiatariaDOM() {
+    let grid = document.getElementById('calcas-alfaiataria-grid');
+    if (!grid) {
+        const cargoGrid = document.getElementById('calcas-cargo-grid') || document.getElementById('calcas-grid');
+        const cargoSection = cargoGrid ? (cargoGrid.closest('section') || cargoGrid.parentElement) : null;
+
+        const wrapper = document.createElement('section');
+        wrapper.className = 'promocoes-wrapper';
+        wrapper.id = 'calcas-alfaiataria-section-wrapper';
+        wrapper.innerHTML = `
+            <h2 style="color: #ffffff;">👖 CALÇAS DE ALFAIATARIA</h2>
+            <div id="calcas-alfaiataria-grid" class="promocoes-carousel-grid"></div>
+        `;
+
+        if (cargoSection && cargoSection.parentNode) {
+            cargoSection.parentNode.insertBefore(wrapper, cargoSection.nextSibling);
+        } else {
+            document.body.appendChild(wrapper);
+        }
+    }
+}
+
+// Garante que a seção de CALÇA CARGO fique abaixo de Calças
+function setupCalcasCargoDOM() {
+    let grid = document.getElementById('calcas-cargo-grid');
+    if (!grid) {
+        const calcasGrid = document.getElementById('calcas-grid');
+        const calcasSection = calcasGrid ? (calcasGrid.closest('section') || calcasGrid.parentElement) : null;
+
+        const wrapper = document.createElement('section');
+        wrapper.className = 'promocoes-wrapper';
+        wrapper.id = 'calcas-cargo-section-wrapper';
+        wrapper.innerHTML = `
+            <h2 style="color: #ffffff;">👖 CALÇAS CARGO</h2>
+            <div id="calcas-cargo-grid" class="promocoes-carousel-grid"></div>
+        `;
+
+        if (calcasSection && calcasSection.parentNode) {
+            calcasSection.parentNode.insertBefore(wrapper, calcasSection.nextSibling);
+        } else {
+            document.body.appendChild(wrapper);
+        }
+    }
+}
+
+// Garante que a seção de CHINELOS fique abaixo das BLUSAS / MOLETONS
 function setupChinelosDOM() {
     let grid = document.getElementById('chinelos-grid');
     if (!grid) {
@@ -1648,19 +1802,27 @@ function createProductCard(p, category, isMaisSaido) {
 }
 
 function renderProducts(products) {
+    setupMaisVendidosDOM();      // Mais vendidos entra ANTES de Camisas
     setupPromocoesDOM();
-    setupMaisVendidosDOM();
+    setupCamisasTimeDOM();       // Camisas de time em grade 2x2
     setupTenisDOM();
-    setupChinelosDOM(); // Monta a área de chinelos abaixo das blusas
+    setupChinelosDOM();
+    setupCalcasCargoDOM();
+    setupCalcasAlfaiatariaDOM();  // Nova seção Calças de Alfaiataria
+    setupAgasalhosDOM();         // Nova seção Agasalhos
 
     const grids = {
         'camisas': document.getElementById('camisas-grid'),
+        'camisas-time': document.getElementById('camisas-time-grid'),
         'tenis': document.getElementById('tenis-grid'),
         'conjuntos': document.getElementById('conjuntos-grid'),
         'promocoes': document.getElementById('promocoes-grid'),
         'moletons': document.getElementById('blusas-grid') || document.getElementById('moletons-grid'),
-        'chinelos': document.getElementById('chinelos-grid'), // Nova categoria Chinelos
+        'agasalhos': document.getElementById('agasalhos-grid'),
+        'chinelos': document.getElementById('chinelos-grid'),
         'calcas': document.getElementById('calcas-grid'),
+        'calcas-cargo': document.getElementById('calcas-cargo-grid'),
+        'calcas-alfaiataria': document.getElementById('calcas-alfaiataria-grid'),
         'perfumes': document.getElementById('perfumes-grid'),
         'bones': document.getElementById('bones-grid'),
         'mais-vendidos': document.getElementById('mais-vendidos-grid') || document.getElementById('mais-vendidos') || document.getElementById('destaques-grid') || document.getElementById('mais-saidos-grid')
@@ -1693,14 +1855,7 @@ function renderProducts(products) {
     }
 
     products.forEach(p => {
-        let category = (p.categoria || p.category || '').toLowerCase().trim();
-
-        // Normalização das categorias
-        if (category === 'tênis' || category === 'snkrs' || category === 'sneakers') {
-            category = 'tenis';
-        } else if (category === 'chinelos' || category === 'chinelo' || category === 'slides' || category === 'slide') {
-            category = 'chinelos';
-        }
+        let category = normalizeCategory(p.categoria || p.category);
         
         if (p.promocao === true || p.emPromocao === true || p.promo === true) {
             category = 'promocoes';
@@ -1726,9 +1881,7 @@ window.openProductDetail = (id) => {
     if (!product) return;
 
     currentDetailProductId = id;
-    let rawCategory = (product.categoria || product.category || '').toLowerCase().trim();
-    if (rawCategory === 'tênis' || rawCategory === 'snkrs' || rawCategory === 'sneakers') rawCategory = 'tenis';
-    if (rawCategory === 'chinelos' || rawCategory === 'chinelo' || rawCategory === 'slides' || rawCategory === 'slide') rawCategory = 'chinelos';
+    let rawCategory = normalizeCategory(product.categoria || product.category);
 
     const title = product.nome || product.title || 'Produto HYPE';
     const price = parseFloat(product.preco || product.price || 0);
@@ -1756,7 +1909,6 @@ window.openProductDetail = (id) => {
         `;
     }
 
-    // Exibe estritamente os tamanhos cadastrados via ADM no modal de detalhes
     const availableSizes = getProductSizes(product, rawCategory);
     if (!selectedSizes[id] || !availableSizes.includes(selectedSizes[id])) {
         selectedSizes[id] = availableSizes[0] || 'Único';
@@ -1767,9 +1919,7 @@ window.openProductDetail = (id) => {
     `).join('');
 
     const related = allProducts.filter(p => {
-        let cat = (p.categoria || p.category || '').toLowerCase().trim();
-        if (cat === 'tênis' || cat === 'snkrs' || cat === 'sneakers') cat = 'tenis';
-        if (cat === 'chinelos' || cat === 'chinelo' || cat === 'slides' || cat === 'slide') cat = 'chinelos';
+        let cat = normalizeCategory(p.categoria || p.category);
         return cat === rawCategory && p.id !== id;
     });
 
@@ -1992,9 +2142,7 @@ window.addToCart = (id) => {
     const product = allProducts.find(p => p.id === id);
     if (!product) return;
 
-    let category = (product.categoria || product.category || '').toLowerCase().trim();
-    if (category === 'tênis' || category === 'snkrs' || category === 'sneakers') category = 'tenis';
-    if (category === 'chinelos' || category === 'chinelo' || category === 'slides' || category === 'slide') category = 'chinelos';
+    let category = normalizeCategory(product.categoria || product.category);
 
     const title = product.nome || product.title || 'Produto HYPE';
     const price = parseFloat(product.preco || product.price || 0);
@@ -2339,4 +2487,4 @@ window.showToast = (msg) => {
 updateCartUI();
 </script>
 </body>
-</html>    
+</html>

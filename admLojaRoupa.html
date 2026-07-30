@@ -262,17 +262,21 @@
                     <div class="input-grid">
                         <div class="input-box full">
                             <label>Nome do Item</label>
-                            <input type="text" id="prod-nome" required placeholder="Ex: Tênis Nike Air Force / Chinelo Slide / Camisa Oversized">
+                            <input type="text" id="prod-nome" required placeholder="Ex: Calça Cargo Streetwear / Agasalho / Tênis Nike">
                         </div>
                         <div class="input-box">
                             <label>Categoria</label>
                             <select id="prod-categoria" required>
-                                <option value="camisas">Camisas</option>
+                                <option value="camisas">Camisas Casuais</option>
+                                <option value="camisas-time">Camisas de Time / Seleções</option>
+                                <option value="agasalhos">Agasalhos</option>
+                                <option value="calcas-cargo">Calças Cargo</option>
+                                <option value="calcas-alfaiataria">Calças de Alfaiataria</option>
                                 <option value="moletons">Moletons</option>
                                 <option value="calcas">Calças</option>
                                 <option value="conjuntos">Conjuntos</option>
                                 <option value="tenis">Tênis</option>
-                                <option value="chinelos">Chinelos</option> <!-- OPÇÃO ADICIONADA -->
+                                <option value="chinelos">Chinelos</option>
                                 <option value="bones">Bonés</option>
                                 <option value="acessorios">Acessórios</option>
                                 <option value="perfumes">Perfumes</option>
@@ -307,14 +311,12 @@
                         <div class="input-box full" id="box-tamanhos-calcados" style="display: none;">
                             <label>Tamanhos Disponíveis (Calçados / Tênis / Chinelos)</label>
                             <div class="size-options">
-                                <!-- TAMANHOS DUPLOS (COMUNS EM CHINELOS) -->
                                 <input type="checkbox" id="sz-3536" value="35/36" class="size-checkbox"><label for="sz-3536" class="size-label">35/36</label>
                                 <input type="checkbox" id="sz-3738" value="37/38" class="size-checkbox"><label for="sz-3738" class="size-label">37/38</label>
                                 <input type="checkbox" id="sz-3940" value="39/40" class="size-checkbox"><label for="sz-3940" class="size-label">39/40</label>
                                 <input type="checkbox" id="sz-4142" value="41/42" class="size-checkbox"><label for="sz-4142" class="size-label">41/42</label>
                                 <input type="checkbox" id="sz-4344" value="43/44" class="size-checkbox"><label for="sz-4344" class="size-label">43/44</label>
 
-                                <!-- TAMANHOS INDIVIDUAIS -->
                                 <input type="checkbox" id="sz-37" value="37" class="size-checkbox"><label for="sz-37" class="size-label">37</label>
                                 <input type="checkbox" id="sz-38" value="38" class="size-checkbox"><label for="sz-38" class="size-label">38</label>
                                 <input type="checkbox" id="sz-39" value="39" class="size-checkbox"><label for="sz-39" class="size-label">39</label>
@@ -362,7 +364,6 @@
 
         const formatCurrency = (v) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
-        // Cache local de produtos para preenchimento no Editar
         window.produtosCache = {};
         let editandoId = null;
 
@@ -515,6 +516,7 @@
                         <button class="btn-danger-glass" onclick="rejeitarPedido('${id}')" style="align-self: flex-end;">[X] Rejeitar</button>
                     </div>
                 `;
+
                 orderListDiv.appendChild(card);
             });
 
@@ -583,11 +585,11 @@
                 labelPreco.textContent = 'Preço Unitário (R$)';
             }
 
-            // Exibição dos Tamanhos (Tênis e Chinelos agora usam o painel de Calçados)
+            // Exibição dos Tamanhos
             if (['tenis', 'chinelos'].includes(cat)) {
                 boxTamanhosCalcados.style.display = 'flex';
                 boxTamanhosRoupas.style.display = 'none';
-            } else if (['camisas', 'moletons', 'calcas', 'conjuntos'].includes(cat)) {
+            } else if (['camisas', 'camisas-time', 'agasalhos', 'calcas-cargo', 'calcas-alfaiataria', 'moletons', 'calcas', 'conjuntos'].includes(cat)) {
                 boxTamanhosRoupas.style.display = 'flex';
                 boxTamanhosCalcados.style.display = 'none';
             } else if (cat === 'promocoes') {
@@ -601,7 +603,6 @@
 
         catSelect.addEventListener('change', atualizarVisibilidadeCampos);
 
-        // Captura tamanhos marcados de caixas visíveis
         function getTamanhosSelecionados() {
             const selecionados = [];
             document.querySelectorAll('.size-checkbox:checked').forEach(cb => {
@@ -613,7 +614,7 @@
             return selecionados;
         }
 
-        // Submeter formulário (Cadastrar ou Atualizar)
+        // Submeter formulário
         formProd.addEventListener('submit', async (e) => {
             e.preventDefault();
             const btnSubmit = document.getElementById('btn-submit');
@@ -638,13 +639,11 @@
                 }
 
                 if (editandoId) {
-                    // MODO ATUALIZAÇÃO
                     produtoData.atualizadoEm = firebase.firestore.FieldValue.serverTimestamp();
                     await db.collection("produtos").doc(editandoId).update(produtoData);
                     alert("Produto atualizado com sucesso!");
                     cancelarEdicao();
                 } else {
-                    // MODO NOVO CADASTRO
                     produtoData.criadoEm = firebase.firestore.FieldValue.serverTimestamp();
                     await db.collection("produtos").add(produtoData);
                     alert("Produto cadastrado com sucesso!");
@@ -701,7 +700,6 @@
             });
         });
 
-        // Preenche formulário para Editar
         function editProd(id) {
             const p = window.produtosCache[id];
             if (!p) return;
@@ -715,7 +713,6 @@
 
             atualizarVisibilidadeCampos();
 
-            // Desmarca todos e depois marca os selecionados do produto
             document.querySelectorAll('.size-checkbox').forEach(cb => {
                 cb.checked = p.tamanhos ? p.tamanhos.includes(cb.value) : false;
             });
@@ -723,11 +720,9 @@
             document.getElementById('btn-submit').textContent = "SALVAR ALTERAÇÕES";
             document.getElementById('btn-cancelar').style.display = "block";
             
-            // Rola suavemente até o formulário
             document.getElementById('form-produto').scrollIntoView({ behavior: 'smooth' });
         }
 
-        // Cancelar Edição
         function cancelarEdicao() {
             editandoId = null;
             formProd.reset();
@@ -744,7 +739,6 @@
             }
         }
 
-        // Inicializa estado inicial do formulário
         atualizarVisibilidadeCampos();
     </script>
 </body>
