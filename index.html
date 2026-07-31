@@ -10,8 +10,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@500;700;800&display=swap" rel="stylesheet">
 
-   <style>
-        /* --- DESIGN SYSTEM & VARIÁVEIS --- */
+    <style>
+ /* --- DESIGN SYSTEM & VARIÁVEIS --- */
 :root {
     --bg: #08080a;
     --bg-subtle: #0f0f13;
@@ -426,16 +426,8 @@ header.scrolled {
     letter-spacing: 0;
 }
 
-/* Grid de Produtos Padrão: Forçado 2 colunas */
-.grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
-    max-width: 800px;
-    margin: 0 auto;
-}
-
-/* --- ROLAGEM HORIZONTAL (CATEGORIA TÊNIS) --- */
+/* --- ROLAGEM HORIZONTAL (UNIFICADO PARA CHINELOS E TÊNIS) --- */
+.grid, 
 .scroll-horizontal {
     display: flex;
     overflow-x: auto;
@@ -447,20 +439,25 @@ header.scrolled {
     margin: 0 auto;
 }
 
+.grid::-webkit-scrollbar,
 .scroll-horizontal::-webkit-scrollbar {
     height: 6px;
 }
 
+.grid::-webkit-scrollbar-track,
 .scroll-horizontal::-webkit-scrollbar-track {
     background: rgba(255, 255, 255, 0.05);
     border-radius: 8px;
 }
 
+.grid::-webkit-scrollbar-thumb,
 .scroll-horizontal::-webkit-scrollbar-thumb {
     background: var(--accent);
     border-radius: 8px;
 }
 
+.grid .card,
+.grid .skeleton,
 .scroll-horizontal .card,
 .scroll-horizontal .skeleton {
     min-width: 260px !important;
@@ -815,13 +812,18 @@ footer {
     .promo-title { font-size: 1.1rem; }
     
     .category-section { padding: 60px 4%; }
-    .grid { gap: 10px; }
+    
+    .grid, .scroll-horizontal { gap: 10px; }
+    .grid .card, .grid .skeleton, .scroll-horizontal .card, .scroll-horizontal .skeleton {
+        min-width: 220px !important;
+        max-width: 220px;
+    }
+    
     .card-img { height: 130px; }
     .card-info { padding: 10px; }
     .modal-center { padding: 20px; width: 94%; }
 }
     </style>
-</head>
 <body>
 
 
@@ -1036,7 +1038,7 @@ footer {
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2026 MAGNATA IMPERIUM BRAND. Todos os direitos reservados. Criado por GT-DEV</p>
+            <p>&copy; 2026 MAGNATA IMPERIUM BRAND. Todos os direitos reservados. Desenvolvido por GT-DEV</p>
         </div>
     </footer>
 
@@ -1838,7 +1840,7 @@ function createProductCard(p, category, isMaisSaido) {
         `;
     }
 
-    let badgeHTML = `<span class="badge-vip">${category === 'promocoes' ? 'OFF' : 'NEW'}</span>`;
+      let badgeHTML = category === 'promocoes' ? `<span class="badge-vip">OFF</span>` : '';
     if (isMaisSaido) {
         badgeHTML = `<span class="badge-vip badge-top">🔥 MAIS SAÍDO</span>`;
     }
@@ -2019,7 +2021,7 @@ window.openProductDetail = (id) => {
                 <h2>${title}</h2>
                 <div class="detail-price-box">
                     ${detailPriceHTML}
-                    <span class="detail-installments">💳 até <strong>${numParcelas}x de R$ ${valorParcela}</strong> sem juros</span>
+                    <span class="detail-installments">💳 até <strong>${numParcelas}x de R$ ${valorParcela}</strong> </span>
                 </div>
 
                 <div>
