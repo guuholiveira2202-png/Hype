@@ -788,6 +788,38 @@
 </head>
 <body>
 
+    <!-- Estilos adicionais para o scroll horizontal (Arrastar para o lado) sem quebrar o seu JS -->
+    <style>
+        .scroll-horizontal {
+            display: flex !important;
+            flex-wrap: nowrap !important;
+            overflow-x: auto !important;
+            gap: 16px;
+            padding-bottom: 20px;
+            scrollbar-width: thin; /* Para Firefox */
+        }
+        
+        /* Estilização da barra de rolagem para navegadores baseados em WebKit (Chrome, Safari) */
+        .scroll-horizontal::-webkit-scrollbar {
+            height: 6px;
+        }
+        .scroll-horizontal::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.05);
+            border-radius: 8px;
+        }
+        .scroll-horizontal::-webkit-scrollbar-thumb {
+            background: var(--accent, #d4af37); /* Usa a cor de destaque do seu tema ou dourado */
+            border-radius: 8px;
+        }
+
+        /* Garante que os cards gerados pelo JS ou skeletons não encolham */
+        .scroll-horizontal .card,
+        .scroll-horizontal .skeleton {
+            min-width: 240px !important; /* Tamanho fixo para dar o efeito de arrastar */
+            flex: 0 0 auto !important;
+        }
+    </style>
+
     <div id="toast" class="toast">Item Adicionado</div>
     <div class="overlay" id="overlay" onclick="closeAllModals()"></div>
     <button id="scrollTopBtn" onclick="window.scrollTo(0,0)">↑</button>
@@ -805,6 +837,8 @@
     <nav class="quick-nav" id="taskyBar">
         <a href="#hero" class="quick-select-btn active">Início</a>
         <a href="#camisas" class="quick-select-btn">Camisas</a>
+        <!-- Tênis movido para ficar logo após Camisas -->
+        <a href="#tenis" class="quick-select-btn">Tênis</a>
         <a href="#blusas" class="quick-select-btn">Blusas</a>
         <a href="#calcas" class="quick-select-btn">Calças</a>
         <a href="#conjuntos" class="quick-select-btn">Conjuntos</a>
@@ -860,9 +894,11 @@
         </div>
     </section>
 
-    <!-- Seções de Produtos (Grid de 2 em 2) -->
+    <!-- Seções de Produtos -->
+    
+    <!-- 1. CAMISAS (De Time incluídas no Título) -->
     <section id="camisas" class="category-section">
-        <h2 class="category-title">Camisas <span>Oversized & Tees</span></h2>
+        <h2 class="category-title">Camisas <span>De Time & Oversized</span></h2>
         <div class="grid" id="camisas-grid">
             <div class="card skeleton" style="height: 250px;"></div>
             <div class="card skeleton" style="height: 250px;"></div>
@@ -871,6 +907,22 @@
         </div>
     </section>
 
+    <!-- 2. TÊNIS (Movido para baixo de Camisas e com a classe scroll-horizontal adicionada) -->
+    <section id="tenis" class="category-section">
+        <h2 class="category-title">Tênis <span>Sneakers Exclusivos</span></h2>
+        <!-- A classe scroll-horizontal foi adicionada. O ID foi mantido para o seu JS funcionar perfeitamente -->
+        <div class="grid scroll-horizontal" id="tenis-grid">
+            <div class="card skeleton" style="height: 250px;"></div>
+            <div class="card skeleton" style="height: 250px;"></div>
+            <div class="card skeleton" style="height: 250px;"></div>
+            <div class="card skeleton" style="height: 250px;"></div>
+            <!-- Adicionei mais skeletons de exemplo para já ver o scroll funcionando -->
+            <div class="card skeleton" style="height: 250px;"></div>
+            <div class="card skeleton" style="height: 250px;"></div>
+        </div>
+    </section>
+
+    <!-- DEMAIS CATEGORIAS -->
     <section id="blusas" class="category-section">
         <h2 class="category-title">Blusas <span>Hoodies & Sweaters</span></h2>
         <div class="grid" id="blusas-grid">
@@ -954,6 +1006,7 @@
                 <h4>Categorias</h4>
                 <ul>
                     <li><a href="#camisas">Camisas</a></li>
+                    <li><a href="#tenis">Tênis</a></li>
                     <li><a href="#blusas">Blusas</a></li>
                     <li><a href="#calcas">Calças</a></li>
                     <li><a href="#conjuntos">Conjuntos</a></li>
@@ -1115,6 +1168,7 @@
         </div>
         <div class="support-content" id="support-content"></div>
     </div>
+
 
 <!-- Script Principal: Firebase, Catálogo, Promoções, Login, Carrinho & Checkout -->
 <script type="module">
