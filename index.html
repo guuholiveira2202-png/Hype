@@ -11,6 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@500;700;800&display=swap" rel="stylesheet">
 
     <style>
+ 
  /* --- DESIGN SYSTEM & VARIÁVEIS --- */
 :root {
     --bg: #08080a;
@@ -426,8 +427,7 @@ header.scrolled {
     letter-spacing: 0;
 }
 
-/* --- ROLAGEM HORIZONTAL (UNIFICADO PARA CHINELOS E TÊNIS) --- */
-.grid, 
+/* --- ROLAGEM HORIZONTAL (Para: Mais Vendidos, Tênis, Promoções e Chinelos) --- */
 .scroll-horizontal {
     display: flex;
     overflow-x: auto;
@@ -439,31 +439,44 @@ header.scrolled {
     margin: 0 auto;
 }
 
-.grid::-webkit-scrollbar,
 .scroll-horizontal::-webkit-scrollbar {
     height: 6px;
 }
 
-.grid::-webkit-scrollbar-track,
 .scroll-horizontal::-webkit-scrollbar-track {
     background: rgba(255, 255, 255, 0.05);
     border-radius: 8px;
 }
 
-.grid::-webkit-scrollbar-thumb,
 .scroll-horizontal::-webkit-scrollbar-thumb {
     background: var(--accent);
     border-radius: 8px;
 }
 
-.grid .card,
-.grid .skeleton,
 .scroll-horizontal .card,
 .scroll-horizontal .skeleton {
     min-width: 260px !important;
     max-width: 260px;
     flex: 0 0 auto !important;
     scroll-snap-align: start;
+}
+
+/* --- GRID VERTICAL (2 em 2 no celular, rolar para baixo - Para: Camisas, Calças, Conjuntos) --- */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding-bottom: 16px;
+}
+
+.grid .card,
+.grid .skeleton {
+    min-width: 100% !important;
+    max-width: 100%;
+    flex: unset !important;
+    scroll-snap-align: unset;
 }
 
 /* --- CARDS DE PRODUTO --- */
@@ -800,7 +813,7 @@ footer {
 #scrollTopBtn.show { opacity: 1; visibility: visible; }
 #scrollTopBtn:hover { border-color: var(--accent); color: var(--accent); }
 
-/* --- RESPONSIVIDADE --- */
+/* --- RESPONSIVIDADE (Ajustes para Celular) --- */
 @media (max-width: 768px) {
     header { padding: 16px 5%; }
     .btn-header { padding: 8px 14px; font-size: 0.68rem; }
@@ -813,17 +826,27 @@ footer {
     
     .category-section { padding: 60px 4%; }
     
-    .grid, .scroll-horizontal { gap: 10px; }
-    .grid .card, .grid .skeleton, .scroll-horizontal .card, .scroll-horizontal .skeleton {
+    /* Grade Vertical 2 por 2 para Camisas, Calças e Conjuntos */
+    .grid { 
+        grid-template-columns: repeat(2, 1fr); 
+        gap: 10px; 
+    }
+    .grid .card-img { height: 140px; }
+    
+    /* Rolagem Horizontal para Mais Vendidos, Tênis, Promoções e Chinelos */
+    .scroll-horizontal { gap: 10px; }
+    .scroll-horizontal .card, 
+    .scroll-horizontal .skeleton {
         min-width: 220px !important;
         max-width: 220px;
     }
-    
-    .card-img { height: 130px; }
+    .scroll-horizontal .card-img { height: 130px; }
+
     .card-info { padding: 10px; }
     .modal-center { padding: 20px; width: 94%; }
 }
-    </style>
+</style>
+    
 <body>
 
 
@@ -919,7 +942,7 @@ footer {
     <section id="tenis" class="category-section">
         <h2 class="category-title">Tênis <span>Sneakers Exclusivos</span></h2>
         <!-- A classe scroll-horizontal foi adicionada. O ID foi mantido para o seu JS funcionar perfeitamente -->
-        <div class="grid scroll-horizontal" id="tenis-grid">
+        <div class="scroll-horizontal" id="tenis-grid">
             <div class="card skeleton" style="height: 250px;"></div>
             <div class="card skeleton" style="height: 250px;"></div>
             <div class="card skeleton" style="height: 250px;"></div>
@@ -987,18 +1010,18 @@ footer {
         <div class="testimonials-grid">
             <div class="testimonial-card">
                 <div class="testimonial-stars">★★★★★</div>
-                <p class="testimonial-text">"As camisetas heavy weight são surreais. Caimento estruturado perfeito sem perder a forma após as lavagens."</p>
-                <div class="testimonial-user"><strong>Matheus S.</strong><span class="testimonial-verified">✓ Cliente VIP</span></div>
+                <p class="testimonial-text">"A camisa do Milan é surreal. Caimento perfeito ."</p>
+                <div class="testimonial-user"><strong>Matheus S.</strong><span class="testimonial-verified"></span></div>
             </div>
             <div class="testimonial-card">
                 <div class="testimonial-stars">★★★★★</div>
-                <p class="testimonial-text">"O perfume tem uma fixação absurda, me pararam duas vezes para perguntar qual eu estava usando."</p>
-                <div class="testimonial-user"><strong>Diego A.</strong><span class="testimonial-verified">✓ Cliente VIP</span></div>
+                <p class="testimonial-text">"Muito braba, qualidade diferenciada."</p>
+                <div class="testimonial-user"><strong>Diego A.</strong><span class="testimonial-verified"></span></div>
             </div>
             <div class="testimonial-card">
                 <div class="testimonial-stars">★★★★★</div>
-                <p class="testimonial-text">"Comprei o conjunto cargo e o acabamento bate de frente com grifes lá de fora. Costuras impecáveis."</p>
-                <div class="testimonial-user"><strong>Lucas M.</strong><span class="testimonial-verified">✓ Cliente VIP</span></div>
+                <p class="testimonial-text">"O Conjunto ta brabo irmão."</p>
+                <div class="testimonial-user"><strong>Lucas M.</strong><span class="testimonial-verified"></span></div>
             </div>
         </div>
     </section>
