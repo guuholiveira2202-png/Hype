@@ -1050,7 +1050,9 @@ footer {
                 <h4>Comunidade</h4>
                 <ul>
                     <li><a href="https://www.instagram.com/magnataimperium" target="_blank">Instagram</a></li>
-                    <li><a href="https://www.whatsapp.com" target="_blank">Whatsapp</a></li>
+                    <li>
+  <a href="https://wa.me/5511913343593?text=Olá!%20Gostaria%20de%20tirar%20uma%20dúvida." target="_blank">Whatsapp</a>
+</li>
                 </ul>
             </div>
         </div>
@@ -1169,7 +1171,7 @@ footer {
                 <label>Selecione o Método</label>
                 <select id="checkout-pagamento" class="form-control" onchange="updatePaymentInfo()" required>
                     <option value="PIX">PIX (Aprovação Instantânea)</option>
-                    <option value="Cartão de Crédito">Cartão de Crédito (PIX no Crédito)</option>
+                    <option value="Cartão de Crédito">Cartão de Crédito </option>
                     <option value="Boleto Bancário">Boleto Bancário</option>
                 </select>
             </div>
@@ -1340,7 +1342,7 @@ function getProductSizes(p, category) {
     return ['P', 'M', 'G', 'GG'];
 }
 
-// Injeção de Estilos CSS Dinâmicos
+// Injeção de Estilos CSS Dinâmicos (Incluindo Estilos do Pix)
 (function injectProductDetailStyles() {
     const style = document.createElement('style');
     style.innerHTML = `
@@ -1574,6 +1576,40 @@ function getProductSizes(p, category) {
             min-width: unset !important;
             width: 100% !important;
         }
+
+        /* ESTILOS ADICIONADOS PARA O MODAL DO PIX DO MERCADO PAGO */
+        .pix-modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(6px);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 100001; padding: 20px; box-sizing: border-box;
+        }
+
+        .pix-modal-card {
+            background: #121216; border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 16px; padding: 24px; max-width: 420px; width: 100%;
+            text-align: center; color: #fff; box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+        }
+
+        .pix-qr-img {
+            width: 220px; height: 220px; border-radius: 12px;
+            margin: 16px auto; display: block; border: 4px solid #009ee3;
+        }
+
+        .pix-copy-input {
+            width: 100%; padding: 12px; background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.2); border-radius: 8px;
+            color: #888; font-size: 0.8rem; text-align: center; margin-bottom: 12px;
+        }
+
+        .pix-btn-copy {
+            background: #009ee3; color: #fff; border: none; padding: 12px 20px;
+            border-radius: 8px; font-weight: 800; cursor: pointer; width: 100%;
+            transition: background 0.2s; font-size: 0.9rem; margin-bottom: 10px;
+        }
+
+        .pix-btn-copy:hover { background: #0081b8; }
+        .pix-btn-close { background: transparent; color: #aaa; border: none; cursor: pointer; font-size: 0.85rem; text-decoration: underline; }
     `;
     document.head.appendChild(style);
 
@@ -1590,13 +1626,13 @@ const savedUser = localStorage.getItem('hype_user');
 if (savedUser) {
     try {
         currentUser = JSON.parse(savedUser);
-        updateUserHeaderUI();
+        if (typeof updateUserHeaderUI === 'function') updateUserHeaderUI();
     } catch (e) {
         console.error("Erro ao carregar usuário:", e);
     }
 }
 
-// Retorno do Mercado Pago
+// Retorno do Mercado Pago (Redirecionamento)
 window.addEventListener('load', async () => {
     initBannerClicks();
 
@@ -1609,10 +1645,10 @@ window.addEventListener('load', async () => {
             const pedidoRef = doc(db, "pedidos", idDoPedido);
             await updateDoc(pedidoRef, { status: 'Aprovado (Pago)' });
             
-            showToast("✅ Pagamento confirmado! Seu pedido já está sendo preparado.");
+            if (typeof showToast === 'function') showToast("✅ Pagamento confirmado! Seu pedido já está sendo preparado.");
             window.history.replaceState(null, '', window.location.pathname);
             
-            if (currentUser) {
+            if (currentUser && typeof openLoginModal === 'function') {
                 setTimeout(() => openLoginModal(), 1500);
             }
         } catch (error) {
@@ -1620,6 +1656,111 @@ window.addEventListener('load', async () => {
         }
     }
 });
+
+// ==========================================
+// 🚀 ADICIONAL: GERENCIADOR DE PIX VIA MERCADO PAGO
+// ==========================================
+
+// Função para exibir o modal Pix com QR Code e Copia e Cola na tela
+window.exibirModalPixMercadoPago = function(qrCodeText, qrCodeBase64, pedidoId) {
+    let overlay = document.getElementById('pix-modal-overlay');
+    if (overlay) overlay.remove();
+
+    overlay = document.createElement('div');
+    overlay.id = 'pix-modal-overlay';
+    overlay.className = 'pix-modal-overlay';
+
+    overlay.innerHTML = `
+        <div class="pix-modal-card">
+            <h3 style="margin:0 0 8px 0; color:#009ee3;">Pagamento via Pix</h3>
+            <p style="font-size:0.85rem; color:#aaa; margin:0;">Escaneie o QR Code ou copie a chave abaixo:</p>
+            
+            <img src="data:image/jpeg;base64,${qrCodeBase64}" alt="QR Code Pix" class="pix-qr-img" />
+            
+            <input type="text" readonly value="${qrCodeText}" id="pix-copy-code" class="pix-copy-input" />
+            
+            <button class="pix-btn-copy" id="btn-copy-pix">📋 COPIAR CHAVE PIX</button>
+            <button class="pix-btn-close" id="btn-close-pix">Fechar Janela</button>
+        </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    // Botão Copiar
+    document.getElementById('btn-copy-pix').onclick = () => {
+        const input = document.getElementById('pix-copy-code');
+        input.select();
+        navigator.clipboard.writeText(input.value);
+        if (typeof showToast === 'function') {
+            showToast("✅ Chave Pix copiada com sucesso!");
+        } else {
+            alert("Chave Pix copiada!");
+        }
+    };
+
+    // Botão Fechar
+    document.getElementById('btn-close-pix').onclick = () => {
+        overlay.remove();
+    };
+
+    // Escutar em tempo real no Firestore se o pedido foi pago para fechar o modal
+    if (pedidoId) {
+        onSnapshot(doc(db, "pedidos", pedidoId), (snapshot) => {
+            if (snapshot.exists()) {
+                const data = snapshot.data();
+                if (data.status === 'Aprovado (Pago)' || data.status === 'approved') {
+                    overlay.remove();
+                    if (typeof showToast === 'function') showToast("🎉 Pagamento Pix confirmado com sucesso!");
+                }
+            }
+        });
+    }
+};
+
+// Função principal de finalização Pix que você pode chamar ao clicar em "PAGAR COM PIX"
+window.gerarPagamentoPixMP = async function(dadosPedido) {
+    try {
+        if (typeof showToast === 'function') showToast("⏳ Gerando cobrança Pix...");
+
+        // 1. Salva o pedido inicial no Firestore
+        const docRef = await addDoc(ordersCol, {
+            ...dadosPedido,
+            status: 'Pendente (Aguardando Pix)',
+            criadoEm: serverTimestamp()
+        });
+
+        // 2. Requisição para a sua rota Backend (Serverless/Node.js) que se comunica com o Mercado Pago
+        const response = await fetch('/api/criar-pix-mercadopago', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                transaction_amount: dadosPedido.total,
+                description: `Pedido ${docRef.id}`,
+                payer: {
+                    email: dadosPedido.email || 'cliente@email.com',
+                    first_name: dadosPedido.nome || 'Cliente'
+                },
+                external_reference: docRef.id
+            })
+        });
+
+        const paymentData = await response.json();
+
+        if (paymentData && paymentData.point_of_interaction) {
+            const qrCode = paymentData.point_of_interaction.transaction_data.qr_code;
+            const qrCodeBase64 = paymentData.point_of_interaction.transaction_data.qr_code_base64;
+            
+            // 3. Exibe a tela com o QR Code
+            window.exibirModalPixMercadoPago(qrCode, qrCodeBase64, docRef.id);
+        } else {
+            throw new Error("Não foi possível obter os dados do Pix.");
+        }
+
+    } catch (err) {
+        console.error("Erro ao gerar Pix:", err);
+        if (typeof showToast === 'function') showToast("❌ Erro ao gerar o Pix. Tente novamente.");
+    }
+};
 
 // Garante que o container de Promoções exista no HTML
 function setupPromocoesDOM() {
@@ -1673,6 +1814,7 @@ function setupMaisVendidosDOM() {
         }
     }
 }
+
 
 // Garante que a seção de TÊNIS fique exatamente ABAIXO das CAMISAS DE TIME
 function setupTenisDOM() {
@@ -2318,7 +2460,79 @@ window.updatePaymentInfo = () => {
     if (!select || !container) return;
 
     const valor = select.value;
-    const pixKey = "00020126580014BR.GOV.BCB.PIX0114hypestore@pix5204000053039865405299.905802BR5910HYPE STORE";
+    
+
+    if (valor === 'PIX') {
+        container.innerHTML = `
+            <div style="background: rgba(212, 175, 55, 0.05); border: 1px solid var(--accent); padding: 20px; border-radius: 8px; margin-top: 15px; text-align: center;">
+                <p style="font-size: 0.85rem; color: var(--accent); font-weight: 800; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px;">Escaneie o QR Code PIX</p>
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(pixKey)}" alt="QR Code PIX" style="width: 160px; height: 160px; border-radius: 8px; border: 2px solid var(--border); margin-bottom: 12px;">
+                <p style="font-size: 0.75rem; color: var(--text-dim); margin-bottom: 8px; text-transform: uppercase;">Ou copie a chave PIX:</p>
+                <div style="display: flex; gap: 8px;">
+                    <input type="text" id="pix-key-input" value="${pixKey}" class="form-control" readonly style="font-size: 0.75rem; background: #000;">
+                    <button type="button" class="btn-header gold-btn" style="white-space: nowrap; padding: 0 15px;" onclick="copiarPix()">Copiar</button>
+                </div>
+            </div>
+        `;
+    } else {
+        container.innerHTML = `
+            <div style="background: rgba(43, 159, 219, 0.1); border: 1px solid #2b9fdb; padding: 15px; border-radius: 8px; margin-top: 15px; text-align: center;">
+                <p style="font-size: 0.85rem; color: #2b9fdb; font-weight: 800; margin-bottom: 8px; text-transform: uppercase;">Pagamento Seguro</p>
+                <p style="font-size: 0.8rem; color: var(--text-dim);">Você será redirecionado para o ambiente seguro do <strong>Mercado Pago</strong> para finalizar sua compra via ${valor}.</p>
+            </div>
+        `;
+    }
+};
+
+window.copiarPix = () => {
+    const input = document.getElementById('pix-key-input');
+    if (input) {
+        input.select();
+        navigator.clipboard.writeText(input.value);
+        showToast("Chave PIX copiada!");
+    }
+};
+
+
+window.toggleCart = () => {
+    const sidebar = document.getElementById('cart-sidebar');
+    const overlay = document.getElementById('overlay');
+    if (sidebar) sidebar.classList.toggle('open');
+    if (overlay) overlay.style.display = sidebar && sidebar.classList.contains('open') ? 'block' : 'none';
+};
+
+window.openCheckoutModal = () => {
+    if (cart.length === 0) return showToast('Adicione produtos na bag primeiro!');
+    
+    const sidebar = document.getElementById('cart-sidebar');
+    if (sidebar) sidebar.classList.remove('open');
+
+    const totalAmount = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
+    const totalValEl = document.getElementById('checkout-total-val');
+    if (totalValEl) totalValEl.textContent = `R$ ${totalAmount.toFixed(2).replace('.', ',')}`;
+
+    if (currentUser) {
+        const emailInput = document.getElementById('checkout-email');
+        const phoneInput = document.getElementById('checkout-whatsapp');
+        if (emailInput) emailInput.value = currentUser.email;
+        if (phoneInput) phoneInput.value = currentUser.phone;
+    }
+
+    const modal = document.getElementById('checkout-modal');
+    const overlay = document.getElementById('overlay');
+    if (modal) modal.classList.add('show');
+    if (overlay) overlay.style.display = 'block';
+
+    updatePaymentInfo();
+};
+
+window.updatePaymentInfo = () => {
+    const select = document.getElementById('checkout-pagamento');
+    const container = document.getElementById('payment-details-container');
+    if (!select || !container) return;
+
+    const valor = select.value;
+    
 
     if (valor === 'PIX') {
         container.innerHTML = `
@@ -2385,7 +2599,9 @@ window.buscarCEP = async () => {
 
 // Inicialização segura dos Formulários
 function initFormListeners() {
-    initBannerClicks();
+    if (typeof initBannerClicks === 'function') {
+        initBannerClicks();
+    }
 
     const loginForm = document.getElementById('simple-login-form');
     if (loginForm && !loginForm.dataset.bound) {
@@ -2414,13 +2630,10 @@ function initFormListeners() {
             const btn = e.target.querySelector('button[type="submit"]');
             const paymentMethod = document.getElementById('checkout-pagamento').value;
             
-            if (paymentMethod === 'PIX') {
-                btn.textContent = "ENVIANDO PEDIDO...";
-            } else {
-                btn.textContent = "GERANDO LINK SEGURO...";
-                btn.style.background = "var(--accent)"; 
-                btn.style.color = "#131110"; 
-            }
+            // Feedback no botão de envio
+            btn.textContent = "CONECTANDO AO MERCADO PAGO...";
+            btn.style.background = "var(--accent)"; 
+            btn.style.color = "#131110"; 
             btn.style.opacity = "1";
 
             const userEmail = document.getElementById('checkout-email').value.trim().toLowerCase();
@@ -2465,38 +2678,41 @@ function initFormListeners() {
             };
 
             try {
+                // 1. Salva o pedido no banco de dados
                 const docRef = await addDoc(ordersCol, novoPedido);
                 
-                if (paymentMethod === 'PIX') {
-                    showToast('Pedido registrado! Realize o pagamento.');
+                showToast('Aguarde, gerando pagamento via Mercado Pago...');
+
+                // =========================================================
+                // 2. CONFIGURE O NOME QUE APARECE NO MERCADO PAGO AQUI:
+                // =========================================================
+                const imperium_magnata = "Imperium Magnata"; 
+                // CORRIGIDO: Agora usa imperium_magnata corretamente
+                const tituloFinal = `${imperium_magnata} - Pedido #${docRef.id.substring(0, 8).toUpperCase()}`;
+
+                // 3. Envia para sua API no Render (Tanto PIX quanto Outros meios)
+                const response = await fetch('https://api-hype-store.onrender.com/gerar-pagamento', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        titulo: tituloFinal,
+                        valor: totalAmount,
+                        email: userEmail,
+                        idPedido: docRef.id,
+                        metodoPagamento: paymentMethod
+                    })
+                });
+
+                const dadosDoMercadoPago = await response.json();
+
+                // 4. Redireciona o usuário para a tela de pagamento do Mercado Pago
+                if (dadosDoMercadoPago.init_point) {
                     cart = [];
                     updateCartUI();
                     checkoutForm.reset();
-                    closeAllModals();
-                    setTimeout(() => openLoginModal(), 500);
-                } else {
-                    showToast('Aguarde, conectando ao Mercado Pago...');
-                    const response = await fetch('https://api-hype-store.onrender.com/gerar-pagamento', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            titulo: "Pedido Hype Store - #" + docRef.id.substring(0, 8).toUpperCase(),
-                            valor: totalAmount,
-                            email: userEmail,
-                            idPedido: docRef.id
-                        })
-                    });
-
-                    const dadosDoMercadoPago = await response.json();
-
-                    if (dadosDoMercadoPago.init_point) {
-                        cart = [];
-                        updateCartUI();
-                        checkoutForm.reset();
-                        window.location.href = dadosDoMercadoPago.init_point;
-                    } else { 
-                        throw new Error("Link init_point não gerado pela API."); 
-                    }
+                    window.location.href = dadosDoMercadoPago.init_point;
+                } else { 
+                    throw new Error("Link init_point não gerado pela API."); 
                 }
 
             } catch (error) {
