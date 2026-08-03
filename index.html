@@ -1200,9 +1200,11 @@ footer {
 <!-- Script Principal: Firebase, Catálogo, Promoções, Login, Carrinho & Checkout -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp, query, where, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-// Configuração do Firebase
+// ==========================================
+// CONFIGURAÇÃO DO FIREBASE
+// ==========================================
 const firebaseConfig = {
     apiKey: "AIzaSyDTc82lRFwmkn0zbNpXyBTIpeXM5WcdOfY",
     authDomain: "loja-de-roupa-59097.firebaseapp.com",
@@ -1215,7 +1217,9 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// Estado Global
+// ==========================================
+// ESTADO GLOBAL
+// ==========================================
 let allProducts = [];
 let cart = [];
 let selectedSizes = {};
@@ -1226,7 +1230,10 @@ let currentDetailProductId = null;
 const productsCol = collection(db, "produtos");
 const ordersCol = collection(db, "pedidos");
 
-// Normalização padronizada de categorias
+// ==========================================
+// FUNÇÕES UTILITÁRIAS
+// ==========================================
+
 function normalizeCategory(rawCategory) {
     let category = (rawCategory || '').toLowerCase().trim();
     
@@ -1252,7 +1259,36 @@ function normalizeCategory(rawCategory) {
     return category;
 }
 
-// Navegação/Rolagem suave para as seções dos banners
+function getProductSizes(p, category) {
+    let raw = p.tamanhos || p.sizes || p.tamanho || p.size;
+    
+    if (raw) {
+        if (Array.isArray(raw) && raw.length > 0) {
+            return raw.map(s => String(s).trim()).filter(Boolean);
+        }
+        if (typeof raw === 'string' && raw.trim() !== '') {
+            return raw.split(',').map(s => s.trim()).filter(Boolean);
+        }
+    }
+
+    if (category === 'perfumes') {
+        const title = p.nome || p.title || '';
+        const matches = title.match(/\b(\d+)\s*ml\b/gi);
+        if (matches && matches.length > 0) {
+            return [...new Set(matches.map(m => m.replace(/\s+/g, '').toUpperCase()))];
+        }
+        return ['100ML'];
+    } 
+    if (category === 'tenis' || category === 'chinelos') {
+        return ['38', '39', '40', '41', '42', '43'];
+    } 
+    if (category === 'bones') {
+        return ['U'];
+    }
+    
+    return ['P', 'M', 'G', 'GG'];
+}
+
 window.scrollToCategory = (categoryKey) => {
     let targetEl = null;
 
@@ -1291,7 +1327,6 @@ window.scrollToCategory = (categoryKey) => {
     }
 };
 
-// Vincula cliques automaticamente nos banners/imagens
 function initBannerClicks() {
     const candidateElements = document.querySelectorAll('img, .banner, [class*="banner"], a, div');
 
@@ -1311,38 +1346,9 @@ function initBannerClicks() {
     });
 }
 
-// Extrair tamanhos cadastrados no ADM ou gera fallbacks inteligentes
-function getProductSizes(p, category) {
-    let raw = p.tamanhos || p.sizes || p.tamanho || p.size;
-    
-    if (raw) {
-        if (Array.isArray(raw) && raw.length > 0) {
-            return raw.map(s => String(s).trim()).filter(Boolean);
-        }
-        if (typeof raw === 'string' && raw.trim() !== '') {
-            return raw.split(',').map(s => s.trim()).filter(Boolean);
-        }
-    }
-
-    if (category === 'perfumes') {
-        const title = p.nome || p.title || '';
-        const matches = title.match(/\b(\d+)\s*ml\b/gi);
-        if (matches && matches.length > 0) {
-            return [...new Set(matches.map(m => m.replace(/\s+/g, '').toUpperCase()))];
-        }
-        return ['100ML'];
-    } 
-    if (category === 'tenis' || category === 'chinelos') {
-        return ['38', '39', '40', '41', '42', '43'];
-    } 
-    if (category === 'bones') {
-        return ['U'];
-    }
-    
-    return ['P', 'M', 'G', 'GG'];
-}
-
-// Injeção de Estilos CSS Dinâmicos (Incluindo Estilos do Pix)
+// ==========================================
+// INJEÇÃO DE ESTILOS CSS E UI
+// ==========================================
 (function injectProductDetailStyles() {
     const style = document.createElement('style');
     style.innerHTML = `
@@ -1555,7 +1561,6 @@ function getProductSizes(p, category) {
             margin-top: 6px !important;
         }
 
-        /* Grade 2 por 2 para Camisas de Time igual às camisas */
         .camisas-time-grid-2col {
             display: grid !important;
             grid-template-columns: repeat(2, 1fr) !important;
@@ -1577,7 +1582,7 @@ function getProductSizes(p, category) {
             width: 100% !important;
         }
 
-        /* ESTILOS ADICIONADOS PARA O MODAL DO PIX DO MERCADO PAGO */
+        /* ESTILOS PIX */
         .pix-modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(6px);
@@ -1621,7 +1626,10 @@ function getProductSizes(p, category) {
     }
 })();
 
-// Carregar usuário do LocalStorage
+// ==========================================
+// INICIALIZAÇÃO DA PÁGINA E USUÁRIO
+// ==========================================
+
 const savedUser = localStorage.getItem('hype_user');
 if (savedUser) {
     try {
@@ -1632,7 +1640,6 @@ if (savedUser) {
     }
 }
 
-// Retorno do Mercado Pago (Redirecionamento)
 window.addEventListener('load', async () => {
     initBannerClicks();
 
@@ -1658,10 +1665,9 @@ window.addEventListener('load', async () => {
 });
 
 // ==========================================
-// 🚀 ADICIONAL: GERENCIADOR DE PIX VIA MERCADO PAGO
+// PAGAMENTO PIX VIA MERCADO PAGO
 // ==========================================
 
-// Função para exibir o modal Pix com QR Code e Copia e Cola na tela
 window.exibirModalPixMercadoPago = function(qrCodeText, qrCodeBase64, pedidoId) {
     let overlay = document.getElementById('pix-modal-overlay');
     if (overlay) overlay.remove();
@@ -1686,24 +1692,17 @@ window.exibirModalPixMercadoPago = function(qrCodeText, qrCodeBase64, pedidoId) 
 
     document.body.appendChild(overlay);
 
-    // Botão Copiar
     document.getElementById('btn-copy-pix').onclick = () => {
         const input = document.getElementById('pix-copy-code');
         input.select();
         navigator.clipboard.writeText(input.value);
-        if (typeof showToast === 'function') {
-            showToast("✅ Chave Pix copiada com sucesso!");
-        } else {
-            alert("Chave Pix copiada!");
-        }
+        if (typeof showToast === 'function') showToast("✅ Chave Pix copiada com sucesso!");
     };
 
-    // Botão Fechar
     document.getElementById('btn-close-pix').onclick = () => {
         overlay.remove();
     };
 
-    // Escutar em tempo real no Firestore se o pedido foi pago para fechar o modal
     if (pedidoId) {
         onSnapshot(doc(db, "pedidos", pedidoId), (snapshot) => {
             if (snapshot.exists()) {
@@ -1717,19 +1716,16 @@ window.exibirModalPixMercadoPago = function(qrCodeText, qrCodeBase64, pedidoId) 
     }
 };
 
-// Função principal de finalização Pix que você pode chamar ao clicar em "PAGAR COM PIX"
 window.gerarPagamentoPixMP = async function(dadosPedido) {
     try {
         if (typeof showToast === 'function') showToast("⏳ Gerando cobrança Pix...");
 
-        // 1. Salva o pedido inicial no Firestore
         const docRef = await addDoc(ordersCol, {
             ...dadosPedido,
             status: 'Pendente (Aguardando Pix)',
             criadoEm: serverTimestamp()
         });
 
-        // 2. Requisição para a sua rota Backend (Serverless/Node.js) que se comunica com o Mercado Pago
         const response = await fetch('/api/criar-pix-mercadopago', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -1749,20 +1745,20 @@ window.gerarPagamentoPixMP = async function(dadosPedido) {
         if (paymentData && paymentData.point_of_interaction) {
             const qrCode = paymentData.point_of_interaction.transaction_data.qr_code;
             const qrCodeBase64 = paymentData.point_of_interaction.transaction_data.qr_code_base64;
-            
-            // 3. Exibe a tela com o QR Code
             window.exibirModalPixMercadoPago(qrCode, qrCodeBase64, docRef.id);
         } else {
             throw new Error("Não foi possível obter os dados do Pix.");
         }
-
     } catch (err) {
         console.error("Erro ao gerar Pix:", err);
         if (typeof showToast === 'function') showToast("❌ Erro ao gerar o Pix. Tente novamente.");
     }
 };
 
-// Garante que o container de Promoções exista no HTML
+// ==========================================
+// GERENCIAMENTO DE SEÇÕES E DOM
+// ==========================================
+
 function setupPromocoesDOM() {
     let promoGrid = document.getElementById('promocoes-grid');
     if (!promoGrid) {
@@ -1770,7 +1766,7 @@ function setupPromocoesDOM() {
         const conjuntosGrid = document.getElementById('conjuntos-grid');
         
         const referenceEl = (conjuntosGrid ? conjuntosGrid.closest('section') || conjuntosGrid.parentElement : null)
-                         || (camisasGrid ? camisasGrid.closest('section') || camisasGrid.parentElement : null);
+                          || (camisasGrid ? camisasGrid.closest('section') || camisasGrid.parentElement : null);
 
         const promoWrapper = document.createElement('section');
         promoWrapper.className = 'promocoes-wrapper';
@@ -1788,7 +1784,6 @@ function setupPromocoesDOM() {
     }
 }
 
-// Garante que o container de MAIS VENDIDOS fique exatamente EM CIMA das CAMISAS
 function setupMaisVendidosDOM() {
     let grid = document.getElementById('mais-vendidos-grid') || 
                document.getElementById('mais-vendidos') || 
@@ -1808,17 +1803,17 @@ function setupMaisVendidosDOM() {
         `;
 
         if (camisasSection && camisasSection.parentNode) {
-            camisasSection.parentNode.insertBefore(wrapper, camisasSection); // Inserido ANTES/ACIMA de Camisas
+            camisasSection.parentNode.insertBefore(wrapper, camisasSection); 
         } else {
             document.body.appendChild(wrapper);
         }
     }
 }
 
-
-// Garante que a seção de TÊNIS fique exatamente ABAIXO das CAMISAS DE TIME
+// 👟 LÓGICA DE TÊNIS DEFINITIVA (REORDENAÇÃO FÍSICA NO DOM)
 function setupTenisDOM() {
     let grid = document.getElementById('tenis-grid');
+    
     if (!grid) {
         const camisasTimeGrid = document.getElementById('camisas-time-grid') || document.getElementById('camisas-grid');
         const referenceSection = camisasTimeGrid ? (camisasTimeGrid.closest('section') || camisasTimeGrid.parentElement) : null;
@@ -1826,15 +1821,86 @@ function setupTenisDOM() {
         const tenisWrapper = document.createElement('section');
         tenisWrapper.className = 'promocoes-wrapper';
         tenisWrapper.id = 'tenis-section-wrapper';
+        
         tenisWrapper.innerHTML = `
             <h2 style="color: #ffffff;">👟 TÊNIS / SNKRS</h2>
-            <div id="tenis-grid" class="promocoes-carousel-grid"></div>
+            <div id="tenis-grid" class="promocoes-carousel-grid" style="overflow-anchor: none;"></div>
         `;
 
         if (referenceSection && referenceSection.parentNode) {
             referenceSection.parentNode.insertBefore(tenisWrapper, referenceSection.nextSibling);
         } else {
             document.body.appendChild(tenisWrapper);
+        }
+        
+        grid = document.getElementById('tenis-grid');
+    }
+
+    if (grid) {
+        let timeoutId;
+        let observador;
+
+        const reordenarGridTenis = () => {
+            // 1. DESLIGA o observador temporariamente para não criar um loop infinito
+            if (observador) observador.disconnect();
+
+            const cards = Array.from(grid.children);
+            if (cards.length > 1) {
+                // Tira o ímã para não brigar com a reordenação
+                grid.style.scrollSnapType = 'none';
+
+                // Extrai os valores numéricos
+                const cardsComValores = cards.map(card => {
+                    const texto = card.innerText || card.textContent || "";
+                    const match = texto.match(/R\$\s*([\d\.,]+)/i);
+                    let valor = 0;
+                    
+                    if (match) {
+                        valor = parseFloat(match[1].replace(/\./g, '').replace(',', '.'));
+                    }
+                    return { card, valor };
+                });
+
+                // Ordena os objetos do menor para o maior preço
+                cardsComValores.sort((a, b) => a.valor - b.valor);
+
+                // 2. MOVE OS ELEMENTOS FISICAMENTE NO HTML
+                cardsComValores.forEach(item => {
+                    grid.appendChild(item.card);
+                    item.card.style.order = ''; // Limpa qualquer CSS antigo que possa atrapalhar
+                });
+
+                // 3. Força a barra para o início
+                grid.scrollLeft = 0;
+
+                // 4. Religa o ímã do scroll em seguida
+                setTimeout(() => {
+                    grid.scrollLeft = 0; // Força de novo por garantia
+                    grid.style.scrollSnapType = 'x mandatory';
+                }, 50);
+            }
+
+            // 5. RELIGA o observador após a organização
+            if (observador) observador.observe(grid, { childList: true });
+        };
+
+        observador = new MutationObserver((mutationsList) => {
+            const itensAdicionados = mutationsList.some(mutation => mutation.addedNodes.length > 0);
+            
+            if (itensAdicionados) {
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(() => {
+                    reordenarGridTenis();
+                }, 100); 
+            }
+        });
+
+        // Inicia a observação inicial
+        observador.observe(grid, { childList: true });
+        
+        // Se já tiver filhos (carregamento rápido da página), ordena imediatamente
+        if (grid.children.length > 0) {
+            reordenarGridTenis();
         }
     }
 }
@@ -2302,49 +2368,57 @@ function renderUserOrdersModal() {
             return;
         }
 
-        snapshot.forEach(doc => {
-            const order = doc.data();
-            const orderId = doc.id.substring(0, 8).toUpperCase();
-            
-            let rawStatus = (order.status || 'pendente').toLowerCase();
-            let statusLabel = 'PENDENTE';
-            let statusClass = 'pendente';
-            let statusIcon = '⏳';
+       snapshot.forEach(doc => {
+    const order = doc.data();
+    const orderId = doc.id.substring(0, 8).toUpperCase();
+    
+    let rawStatus = (order.status || 'pendente').toLowerCase();
+    let statusLabel = 'PENDENTE';
+    let statusClass = 'pendente';
+    let statusIcon = '⏳';
+    
+    if (rawStatus === 'aprovado' || rawStatus === 'pago' || rawStatus === 'concluido' || rawStatus === 'aprovado (pago)') {
+        statusLabel = 'APROVADO';
+        statusClass = 'aprovado';
+        statusIcon = '✅';
+    } else if (rawStatus === 'rejeitado' || rawStatus === 'rejeitado' || rawStatus === 'rejeitado') {
+        statusLabel = 'NEGADO';
+        statusClass = 'rejeitado';
+        statusIcon = '❌';
+    } else if (rawStatus === 'enviado') {
+        statusLabel = 'ENVIADO';
+        statusClass = 'enviado';
+        statusIcon = '🚚';
+    } else if (rawStatus === 'entregue') {
+        statusLabel = 'ENTREGUE';
+        statusClass = 'entregue';
+        statusIcon = '📦';
+    }
 
-            if (rawStatus === 'aprovado' || rawStatus === 'pago' || rawStatus === 'concluido' || rawStatus === 'aprovado (pago)') {
-                statusLabel = 'APROVADO';
-                statusClass = 'aprovado';
-                statusIcon = '✅';
-            } else if (rawStatus === 'negado' || rawStatus === 'recusado' || rawStatus === 'cancelado') {
-                statusLabel = 'NEGADO';
-                statusClass = 'negado';
-                statusIcon = '❌';
-            }
+    const itemsText = order.items ? order.items.map(i => `${i.qty}x ${i.name} (${i.size})`).join(', ') : 'Itens variados';
+    const totalVal = order.totals ? order.totals.finalTotal : 0;
 
-            const itemsText = order.items ? order.items.map(i => `${i.qty}x ${i.name} (${i.size})`).join(', ') : 'Itens variados';
-            const totalVal = order.totals ? order.totals.finalTotal : 0;
-
-            const orderEl = document.createElement('div');
-            orderEl.className = 'order-card';
-            orderEl.innerHTML = `
-                <div class="order-header-row">
-                    <span class="order-id">#${orderId}</span>
-                    <span class="status-badge ${statusClass}">${statusIcon} ${statusLabel}</span>
-                </div>
-                <div class="order-items-summary">
-                    <strong>Itens:</strong> ${itemsText}
-                </div>
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:5px;">
-                    <span style="font-size:0.75rem; color:var(--text-dim);">Pagamento: ${order.payment ? order.payment.method : 'PIX'}</span>
-                    <span class="order-total-val">R$ ${parseFloat(totalVal).toFixed(2).replace('.', ',')}</span>
-                </div>
-            `;
-            ordersContainer.appendChild(orderEl);
-        });
-    }, (error) => {
-        console.error("Erro ao buscar pedidos:", error);
-        ordersContainer.innerHTML = `<p style="color:var(--status-negado); text-align:center; font-size:0.85rem;">Erro ao carregar status do pedido.</p>`;
-    });
+    const orderEl = document.createElement('div');
+    orderEl.className = 'order-card';
+    orderEl.innerHTML = `
+        <div class="order-header-row">
+            <span class="order-id">#${orderId}</span>
+            <span class="status-badge ${statusClass}">${statusIcon} ${statusLabel}</span>
+        </div>
+        <div class="order-items-summary">
+            <strong>Itens:</strong> ${itemsText}
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:5px;">
+            <span style="font-size:0.75rem; color:var(--text-dim);">Pagamento: ${order.payment ? order.payment.method : 'PIX'}</span>
+            <span class="order-total-val">R$ ${parseFloat(totalVal).toFixed(2).replace('.', ',')}</span>
+        </div>
+    `;
+    ordersContainer.appendChild(orderEl);
+});
+}, (error) => {
+    console.error("Erro ao buscar pedidos:", error);
+    ordersContainer.innerHTML = `<p style="color:var(--status-negado); text-align:center; font-size:0.85rem;">Erro ao carregar status do pedido.</p>`;
+});
 }
 
 // Seleção de tamanho no card do catálogo
@@ -2461,7 +2535,6 @@ window.updatePaymentInfo = () => {
 
     const valor = select.value;
     
-
     if (valor === 'PIX') {
         container.innerHTML = `
             <div style="background: rgba(212, 175, 55, 0.05); border: 1px solid var(--accent); padding: 20px; border-radius: 8px; margin-top: 15px; text-align: center;">
@@ -2492,7 +2565,6 @@ window.copiarPix = () => {
         showToast("Chave PIX copiada!");
     }
 };
-
 
 window.toggleCart = () => {
     const sidebar = document.getElementById('cart-sidebar');
@@ -2533,7 +2605,6 @@ window.updatePaymentInfo = () => {
 
     const valor = select.value;
     
-
     if (valor === 'PIX') {
         container.innerHTML = `
             <div style="background: rgba(212, 175, 55, 0.05); border: 1px solid var(--accent); padding: 20px; border-radius: 8px; margin-top: 15px; text-align: center;">
