@@ -35,7 +35,6 @@
             padding: 20px;
         }
 
-        /* HEADER & DASHBOARD ACCENT */
         header {
             display: flex;
             justify-content: space-between;
@@ -79,7 +78,6 @@
             color: var(--acid-green);
         }
 
-        /* NAVEGAÇÃO */
         nav {
             display: flex;
             gap: 12px;
@@ -103,7 +101,6 @@
             border-color: var(--acid-green);
         }
 
-        /* SEÇÕES */
         .view-section {
             display: none;
         }
@@ -112,7 +109,6 @@
             display: block;
         }
 
-        /* ABAS E AÇÕES DE PEDIDOS */
         .controls-bar {
             display: flex;
             justify-content: space-between;
@@ -149,7 +145,6 @@
             gap: 10px;
         }
 
-        /* CARDS DE PEDIDO */
         .order-card {
             background: var(--glass-bg);
             border: 1px solid var(--glass-border);
@@ -229,7 +224,6 @@
         }
 
         .item-row:last-child { border-bottom: none; }
-
         .item-left { display: flex; align-items: center; gap: 12px; }
         .item-left img { width: 42px; height: 42px; object-fit: cover; border-radius: 6px; }
 
@@ -259,7 +253,6 @@
             outline: none;
         }
 
-        /* BOTÕES GERAIS */
         button {
             cursor: pointer;
             border: none;
@@ -296,7 +289,6 @@
 
         .btn-edit-glass:hover { background: rgba(255, 255, 255, 0.15); }
 
-        /* FORMULÁRIO DE PRODUTOS */
         .form-container {
             background: var(--glass-bg);
             border: 1px solid var(--glass-border);
@@ -469,26 +461,8 @@
         </div>
     </section>
 
-    <!-- ================= JAVASCRIPT INTEGRADO ================= -->
+    <!-- ================= JAVASCRIPT INTEGRADO (COM CHAMADAS VIA BACKEND) ================= -->
     <script>
-        // CONFIG TOKEN SUPERFRETE
-        const SUPERFRETE_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3ODU3ODIzMzksInN1YiI6IjBRa2w2ak44V3ZoNno4dzNaUENFU0dBVFZLMTIifQ.WpOfGKBeqydGDYHcksFHo4UUhVZRPqKfUMjb7aJPKiI";
-
-        // DADOS DO SEU ENDEREÇO DE ORIGEM / REMETENTE
-        const REMETENTE_ORIGEM = {
-            name: "Magnata Imperium",
-            phone: "11999999999",
-            email: "contato@magnataimperium.com",
-            document: "11122233344", // ⚠️ Insira um CPF ou CNPJ real válido
-            company_name: "Magnata Imperium",
-            postal_code: "01001000",
-            address: "Praça da Sé",
-            number: "100",
-            district: "Centro",
-            city: "São Paulo",
-            state_code: "SP"
-        };
-
         // CONFIG FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyDTc82lRFwmkn0zbNpXyBTIpeXM5WcdOfY",
@@ -551,71 +525,17 @@
             });
         }
 
-        // ================= INTEGRAÇÃO API SUPERFRETE =================
+        // ================= INTEGRAÇÃO API SUPERFRETE VIA BACKEND =================
         async function enviarPedidoAPI(p) {
-            const targetUrl = "https://api.superfrete.com/api/v2/cart";
-            const proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(targetUrl);
-
-            const cepLimpo = (p.shipping?.cep || "").replace(/\D/g, '');
-            if (!cepLimpo || cepLimpo.length !== 8) {
-                throw new Error(`CEP Inválido ou Ausente (${p.shipping?.cep || 'vazio'})`);
-            }
-
-            const payload = {
-                from: {
-                    ...REMETENTE_ORIGEM,
-                    postal_code: REMETENTE_ORIGEM.postal_code.replace(/\D/g, ''),
-                    phone: REMETENTE_ORIGEM.phone.replace(/\D/g, ''),
-                    document: REMETENTE_ORIGEM.document.replace(/\D/g, '')
+            // Requisição enviada para a rota segura do SEU backend
+            const response = await fetch('/api/superfrete/cart', {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
                 },
-                to: {
-                    name: p.cliente?.nome || "Cliente Imperium",
-                    phone: (p.cliente?.whatsapp || "11999999999").replace(/\D/g, ''),
-                    email: p.cliente?.email || "contato@cliente.com",
-                    document: (p.cliente?.cpf || "00000000000").replace(/\D/g, ''),
-                    postal_code: cepLimpo,
-                    address: p.shipping?.logradouro || "Rua Principal",
-                    number: p.shipping?.numero || "10",
-                    district: p.shipping?.bairro || "Bairro",
-                    city: (p.shipping?.cidadeUF || "Sao Paulo/SP").split('/')[0].trim(),
-                    state_code: (p.shipping?.cidadeUF || "SP").split('/')[1]?.trim() || "SP",
-                    note: `Pedido #${p.id.substring(0,8).toUpperCase()}`
-                },
-                products: p.items?.map(i => ({
-                    name: i.name || "Item Magnata",
-                    quantity: Number(i.quantity) || 1,
-                    unitary_value: Number(i.price) || 10
-                })) || [],
-                volumes: [{
-                    height: 10,
-                    width: 15,
-                    length: 20,
-                    weight: 0.5
-                }],
-                options: {
-                    insurance_value: Number(p.totals?.finalTotal) || 0,
-                    receipt: false,
-                    own_hand: false,
-                    reverse: false,
-                    non_commercial: true
-                },
-                service: 1
-            };
-
-            let response;
-            try {
-                response = await fetch(proxyUrl, {
-                    method: "POST",
-                    headers: {
-                        "Authorization": `Bearer ${SUPERFRETE_TOKEN}`,
-                        "Content-Type": "application/json",
-                        "Accept": "application/json"
-                    },
-                    body: JSON.stringify(payload)
-                });
-            } catch (err) {
-                throw new Error(`Falha ao conectar à API/Proxy: ${err.message}`);
-            }
+                body: JSON.stringify({ pedido: p })
+            });
 
             const resText = await response.text();
             let jsonResult;
@@ -623,12 +543,12 @@
             try {
                 jsonResult = JSON.parse(resText);
             } catch (e) {
-                throw new Error(`A API não retornou um JSON válido. Resposta recebida:\n\n${resText.substring(0, 300)}`);
+                throw new Error(`O backend não retornou um JSON válido:\n\n${resText.substring(0, 300)}`);
             }
 
             if (!response.ok) {
                 const erroDetalhado = jsonResult.message || jsonResult.error || JSON.stringify(jsonResult);
-                throw new Error(`Status ${response.status}: ${erroDetalhado}`);
+                throw new Error(`Erro do Servidor (${response.status}): ${erroDetalhado}`);
             }
 
             return jsonResult;
@@ -642,10 +562,10 @@
             }
 
             try {
-                alert(`Iniciando envio do pedido #${id.substring(0,8).toUpperCase()} ao SuperFrete...`);
+                alert(`Iniciando envio do pedido #${id.substring(0,8).toUpperCase()} ao SuperFrete via Backend...`);
                 await enviarPedidoAPI(p);
                 await updateStatus(id, 'enviado');
-                alert(`✅ Sucesso! O Pedido #${id.substring(0,8).toUpperCase()} foi inserido no seu carrinho do SuperFrete e marcado como enviado.`);
+                alert(`✅ Sucesso! O Pedido #${id.substring(0,8).toUpperCase()} foi inserido no carrinho do SuperFrete.`);
             } catch (error) {
                 console.error("Erro na API SuperFrete:", error);
                 alert(`❌ Erro ao enviar para o SuperFrete:\n${error.message}`);
@@ -665,7 +585,7 @@
                 return;
             }
 
-            if (!confirm(`Deseja enviar ${pedidosPagos.length} pedido(s) PAGOS para a API do SuperFrete?`)) return;
+            if (!confirm(`Deseja enviar ${pedidosPagos.length} pedido(s) PAGOS para a API do SuperFrete via Backend?`)) return;
 
             btnGeral.disabled = true;
             btnGeral.textContent = "ENVIANDO PAGOS...";
@@ -686,7 +606,7 @@
 
             btnGeral.disabled = false;
             btnGeral.innerHTML = "🚀 Enviar Pedidos Pagos p/ SuperFrete";
-            alert(`Processo concluído!\n\n✅ Sucessos: ${acertos}\n❌ Falhas: ${erros}\n\nAcesse sua conta do SuperFrete para emitir as etiquetas no carrinho.`);
+            alert(`Processo concluído!\n\n✅ Sucessos: ${acertos}\n❌ Falhas: ${erros}`);
         }
 
         // ================= PEDIDOS EM TEMPO REAL =================
