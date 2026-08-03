@@ -849,8 +849,6 @@ footer {
     
 <body>
 
-
-
     <div id="toast" class="toast">Item Adicionado</div>
     <div class="overlay" id="overlay" onclick="closeAllModals()"></div>
     <button id="scrollTopBtn" onclick="window.scrollTo(0,0)">↑</button>
@@ -870,7 +868,6 @@ footer {
         <a href="#mais-vendidos-grid" class="quick-select-btn">Mais Vendidos 🔥</a>
         <a href="#camisas" class="quick-select-btn">Camisas</a>
         <a href="#camisas-time-grid" class="quick-select-btn">Camisas De Time</a>
-        <!-- Tênis movido para ficar logo após Camisas -->
         <a href="#tenis" class="quick-select-btn">Tênis</a>
         <a href="#blusas" class="quick-select-btn">Blusas</a>
         <a href="#agasalhos-grid" class="quick-select-btn">Agasalhos</a>
@@ -878,7 +875,7 @@ footer {
         <a href="#calcas" class="quick-select-btn">Calças</a>
         <a href="#conjuntos" class="quick-select-btn">Conjuntos</a>
         <a href="#promocoes-grid" class="quick-select-btn">Promoções</a>
-         <a href="#bones-grid" class="quick-select-btn">Bonés</a>
+        <a href="#bones-grid" class="quick-select-btn">Bonés</a>
     </nav>
 
     <!-- Hero Section -->
@@ -931,7 +928,7 @@ footer {
 
     <!-- Seções de Produtos -->
     
-    <!-- 1. CAMISAS (De Time incluídas no Título) -->
+    <!-- 1. CAMISAS -->
     <section id="camisas" class="category-section">
         <h2 class="category-title">Camisas <span>De Time & Oversized</span></h2>
         <div class="grid" id="camisas-grid">
@@ -942,16 +939,14 @@ footer {
         </div>
     </section>
 
-    <!-- 2. TÊNIS (Movido para baixo de Camisas e com a classe scroll-horizontal adicionada) -->
+    <!-- 2. TÊNIS -->
     <section id="tenis" class="category-section">
         <h2 class="category-title">Tênis <span>Sneakers Exclusivos</span></h2>
-        <!-- A classe scroll-horizontal foi adicionada. O ID foi mantido para o seu JS funcionar perfeitamente -->
         <div class="scroll-horizontal" id="tenis-grid">
             <div class="card skeleton" style="height: 250px;"></div>
             <div class="card skeleton" style="height: 250px;"></div>
             <div class="card skeleton" style="height: 250px;"></div>
             <div class="card skeleton" style="height: 250px;"></div>
-            <!-- Adicionei mais skeletons de exemplo para já ver o scroll funcionando -->
             <div class="card skeleton" style="height: 250px;"></div>
             <div class="card skeleton" style="height: 250px;"></div>
         </div>
@@ -1050,9 +1045,7 @@ footer {
                 <h4>Comunidade</h4>
                 <ul>
                     <li><a href="https://www.instagram.com/magnataimperium" target="_blank">Instagram</a></li>
-                    <li>
-  <a href="https://wa.me/5511913343593?text=Olá!%20Gostaria%20de%20tirar%20uma%20dúvida." target="_blank">Whatsapp</a>
-</li>
+                    <li><a href="https://wa.me/5511913343593?text=Olá!%20Gostaria%20de%20tirar%20uma%20dúvida." target="_blank">Whatsapp</a></li>
                 </ul>
             </div>
         </div>
@@ -1125,15 +1118,21 @@ footer {
                 <label>Nome Completo</label>
                 <input type="text" id="checkout-nome" class="form-control" placeholder="Seu nome completo" required>
             </div>
+            
+            <!-- CAMPO DE CPF ADICIONADO AQUI -->
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                 <div class="form-group">
-                    <label>E-mail (Gmail)</label>
-                    <input type="email" id="checkout-email" class="form-control" placeholder="seuemail@gmail.com" required>
+                    <label>CPF</label>
+                    <input type="text" id="checkout-cpf" class="form-control" placeholder="000.000.000-00" maxlength="14" required>
                 </div>
                 <div class="form-group">
                     <label>WhatsApp / Telefone</label>
                     <input type="tel" id="checkout-whatsapp" class="form-control" placeholder="(11) 99999-9999" required>
                 </div>
+            </div>
+            <div class="form-group">
+                <label>E-mail (Gmail)</label>
+                <input type="email" id="checkout-email" class="form-control" placeholder="seuemail@gmail.com" required>
             </div>
 
             <h4 style="color: var(--accent); margin: 16px 0 12px; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px;">2. Endereço de Entrega</h4>
@@ -1195,7 +1194,6 @@ footer {
         </div>
         <div class="support-content" id="support-content"></div>
     </div>
-
 
 <!-- Script Principal: Firebase, Catálogo, Promoções, Login, Carrinho & Checkout -->
 <script type="module">
@@ -2840,13 +2838,15 @@ function initFormListeners() {
                 img: item.img
             }));
 
-            const novoPedido = {
+          const novoPedido = {
                 status: "pendente",
                 createdAt: serverTimestamp(),
                 cliente: {
                     nome: document.getElementById('checkout-nome').value,
                     email: userEmail,
-                    whatsapp: userPhone
+                    whatsapp: userPhone,
+                    // CAPTURA E LIMPA O CPF (REMOVE PONTOS E TRAÇOS)
+                    cpf: document.getElementById('checkout-cpf') ? document.getElementById('checkout-cpf').value.replace(/\D/g, '') : ''
                 },
                 shipping: {
                     cep: document.getElementById('checkout-cep').value,

@@ -211,6 +211,7 @@
 
         .grid-cell .main-data { font-weight: 600; font-size: 0.9rem; }
         .grid-cell .sub-data { font-size: 0.8rem; color: #aaa; }
+        .grid-cell .email-data { font-size: 0.8rem; color: #aaa; word-break: break-all; }
         .grid-cell .total-val { color: var(--acid-green); font-size: 1.1rem; font-weight: bold; }
 
         .items-panel {
@@ -478,9 +479,9 @@
             name: "Magnata Imperium",
             phone: "11999999999",
             email: "contato@magnataimperium.com",
-            document: "00000000000",
+            document: "11122233344", // ⚠️ Insira um CPF ou CNPJ real válido
             company_name: "Magnata Imperium",
-            postal_code: "01001000", // CEP de origem
+            postal_code: "01001000",
             address: "Praça da Sé",
             number: "100",
             district: "Centro",
@@ -500,7 +501,7 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        const formatCurrency = (v) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        const formatCurrency = (v) => (v || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
         window.produtosCache = {};
         window.pedidosCache = [];
@@ -561,7 +562,12 @@
             }
 
             const payload = {
-                from: REMETENTE_ORIGEM,
+                from: {
+                    ...REMETENTE_ORIGEM,
+                    postal_code: REMETENTE_ORIGEM.postal_code.replace(/\D/g, ''),
+                    phone: REMETENTE_ORIGEM.phone.replace(/\D/g, ''),
+                    document: REMETENTE_ORIGEM.document.replace(/\D/g, '')
+                },
                 to: {
                     name: p.cliente?.nome || "Cliente Imperium",
                     phone: (p.cliente?.whatsapp || "11999999999").replace(/\D/g, ''),
@@ -577,8 +583,8 @@
                 },
                 products: p.items?.map(i => ({
                     name: i.name || "Item Magnata",
-                    quantity: i.quantity || 1,
-                    unitary_value: i.price || 10
+                    quantity: Number(i.quantity) || 1,
+                    unitary_value: Number(i.price) || 10
                 })) || [],
                 volumes: [{
                     height: 10,
@@ -587,7 +593,7 @@
                     weight: 0.5
                 }],
                 options: {
-                    insurance_value: p.totals?.finalTotal || 0,
+                    insurance_value: Number(p.totals?.finalTotal) || 0,
                     receipt: false,
                     own_hand: false,
                     reverse: false,
@@ -596,22 +602,36 @@
                 service: 1
             };
 
-            const response = await fetch(proxyUrl, {
-                method: "POST",
-                headers: {
-                    "Authorization": `Bearer ${SUPERFRETE_TOKEN}`,
-                    "Content-Type": "application/json",
-                    "Accept": "application/json"
-                },
-                body: JSON.stringify(payload)
-            });
-
-            if (!response.ok) {
-                const resText = await response.text();
-                throw new Error(`Status ${response.status}: ${resText}`);
+            let response;
+            try {
+                response = await fetch(proxyUrl, {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${SUPERFRETE_TOKEN}`,
+                        "Content-Type": "application/json",
+                        "Accept": "application/json"
+                    },
+                    body: JSON.stringify(payload)
+                });
+            } catch (err) {
+                throw new Error(`Falha ao conectar à API/Proxy: ${err.message}`);
             }
 
-            return await response.json();
+            const resText = await response.text();
+            let jsonResult;
+
+            try {
+                jsonResult = JSON.parse(resText);
+            } catch (e) {
+                throw new Error(`A API não retornou um JSON válido. Resposta recebida:\n\n${resText.substring(0, 300)}`);
+            }
+
+            if (!response.ok) {
+                const erroDetalhado = jsonResult.message || jsonResult.error || JSON.stringify(jsonResult);
+                throw new Error(`Status ${response.status}: ${erroDetalhado}`);
+            }
+
+            return jsonResult;
         }
 
         async function enviarPedidoSuperFrete(id) {
@@ -665,7 +685,7 @@
             }
 
             btnGeral.disabled = false;
-            btnGeral.innerHTML = "<span>🚀</span> Enviar Pedidos Pagos p/ SuperFrete";
+            btnGeral.innerHTML = "🚀 Enviar Pedidos Pagos p/ SuperFrete";
             alert(`Processo concluído!\n\n✅ Sucessos: ${acertos}\n❌ Falhas: ${erros}\n\nAcesse sua conta do SuperFrete para emitir as etiquetas no carrinho.`);
         }
 
@@ -736,7 +756,8 @@
                             <label>👤 DESTINATÁRIO</label>
                             <div class="main-data">${p.cliente?.nome || 'Nome não informado'}</div>
                             <div class="email-data">${p.cliente?.email || 'Gmail/E-mail N/A'}</div>
-                            <div class="sub-data">${p.cliente?.whatsapp || ''}</div>
+                            <div class="sub-data">📱 ${p.cliente?.whatsapp || 'Sem Whats'}</div>
+                            <div class="sub-data" style="color:var(--acid-green); font-weight: bold; margin-top:2px;">🪪 CPF: ${p.cliente?.cpf || 'Não informado'}</div>
                         </div>
                         <div class="grid-cell">
                             <label>📅 DATA/HORA</label>
