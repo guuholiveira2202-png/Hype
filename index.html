@@ -1936,7 +1936,6 @@ function setupMaisVendidosDOM() {
         }
     }
 }
-
 // 👟 LÓGICA DE TÊNIS DEFINITIVA (REORDENAÇÃO FÍSICA NO DOM)
 function setupTenisDOM() {
     let grid = document.getElementById('tenis-grid');
@@ -2114,7 +2113,7 @@ function setupCalcasCargoDOM() {
     }
 }
 
-// Garante que a seção de CHINELOS fique abaixo das BLUSAS / MOLETONS
+// Garante que a seção de CHINELOS fique abaixo das BLUSAS / MOLETONS e ORDENE POR PREÇO
 function setupChinelosDOM() {
     let grid = document.getElementById('chinelos-grid');
     if (!grid) {
@@ -2124,15 +2123,80 @@ function setupChinelosDOM() {
         const chinelosWrapper = document.createElement('section');
         chinelosWrapper.className = 'promocoes-wrapper';
         chinelosWrapper.id = 'chinelos-section-wrapper';
+        
+        // Adicionado style="overflow-anchor: none;" igual ao grid de tênis para evitar pulos na tela durante a reordenação
         chinelosWrapper.innerHTML = `
             <h2 style="color: #ffffff;">🩴 CHINELOS / SLIDES</h2>
-            <div id="chinelos-grid" class="promocoes-carousel-grid"></div>
+            <div id="chinelos-grid" class="promocoes-carousel-grid" style="overflow-anchor: none;"></div>
         `;
 
         if (blusasSection && blusasSection.parentNode) {
             blusasSection.parentNode.insertBefore(chinelosWrapper, blusasSection.nextSibling);
         } else {
             document.body.appendChild(chinelosWrapper);
+        }
+        
+        // Atualiza a variável grid após criar no DOM
+        grid = document.getElementById('chinelos-grid');
+    }
+
+    // Lógica de ordenação idêntica à de Tênis
+    if (grid) {
+        let timeoutId;
+        let observador;
+
+        const reordenarGridChinelos = () => {
+            if (observador) observador.disconnect();
+
+            const cards = Array.from(grid.children);
+            if (cards.length > 1) {
+                grid.style.scrollSnapType = 'none';
+
+                const cardsComValores = cards.map(card => {
+                    const texto = card.innerText || card.textContent || "";
+                    const match = texto.match(/R\$\s*([\d\.,]+)/i);
+                    let valor = 0;
+                    
+                    if (match) {
+                        valor = parseFloat(match[1].replace(/\./g, '').replace(',', '.'));
+                    }
+                    return { card, valor };
+                });
+
+                // Ordena do menor para o maior preço
+                cardsComValores.sort((a, b) => a.valor - b.valor);
+
+                cardsComValores.forEach(item => {
+                    grid.appendChild(item.card);
+                    item.card.style.order = '';
+                });
+
+                grid.scrollLeft = 0;
+
+                setTimeout(() => {
+                    grid.scrollLeft = 0;
+                    grid.style.scrollSnapType = 'x mandatory';
+                }, 50);
+            }
+
+            if (observador) observador.observe(grid, { childList: true });
+        };
+
+        observador = new MutationObserver((mutationsList) => {
+            const itensAdicionados = mutationsList.some(mutation => mutation.addedNodes.length > 0);
+            
+            if (itensAdicionados) {
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(() => {
+                    reordenarGridChinelos();
+                }, 100); 
+            }
+        });
+
+        observador.observe(grid, { childList: true });
+        
+        if (grid.children.length > 0) {
+            reordenarGridChinelos();
         }
     }
 }
