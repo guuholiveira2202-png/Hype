@@ -9,14 +9,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@500;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css">
 </head>
     
-
-    
 <body>
-
-
 
     <div id="toast" class="toast">Item Adicionado</div>
     <div class="overlay" id="overlay" onclick="closeAllModals()"></div>
@@ -37,7 +33,6 @@
         <a href="#mais-vendidos-grid" class="quick-select-btn">Mais Vendidos 🔥</a>
         <a href="#camisas" class="quick-select-btn">Camisas</a>
         <a href="#camisas-time-grid" class="quick-select-btn">Camisas De Time</a>
-        <!-- Tênis movido para ficar logo após Camisas -->
         <a href="#tenis" class="quick-select-btn">Tênis</a>
         <a href="#blusas" class="quick-select-btn">Blusas</a>
         <a href="#agasalhos-grid" class="quick-select-btn">Agasalhos</a>
@@ -45,12 +40,14 @@
         <a href="#calcas" class="quick-select-btn">Calças</a>
         <a href="#conjuntos" class="quick-select-btn">Conjuntos</a>
         <a href="#promocoes-grid" class="quick-select-btn">Promoções</a>
-         <a href="#bones-grid" class="quick-select-btn">Bonés</a>
+        <a href="#bones-grid" class="quick-select-btn">Bonés</a>
     </nav>
 
     <!-- Hero Section -->
     <section id="hero">
-        <h1>Magnata <span>Imperium</span></h1>
+        <!-- SOMENTE ESTA LOGO FOI ALTERADA (Substituindo o H1) -->
+        <img src="https://scontent-gru2-2.xx.fbcdn.net/v/t1.15752-9/756682778_1768614744328024_4516698446308594190_n.jpg?stp=dst-jpg_s960x960_tt6&_nc_cat=106&ccb=1-7&_nc_sid=9f807c&_nc_ohc=AmMyavL3W5YQ7kNvwHAsI2h&_nc_oc=Ado4swuVwnCTdoI_qhgciIK7qfSuU_8Wzfyfo2NfVjn7gfJxmzpJSHzEmCCikrew4qY&_nc_zt=23&_nc_ht=scontent-gru2-2.xx&_nc_ss=7b6a8&oh=03_Q7cD6AE_7H8H69DYRJj7rW82u8nG7OAjNq6uSoJMK1Y4UKSbng&oe=6A9BB2C2" alt="Magnata Imperium Logo" class="hero-logo">
+        
         <p>A MAGNATA IMPERIUM🦅 chegou. <br> <br>
             Aqui vai ter camisa de time, peças das melhores marcas, conjuntos, sport fino e muito mais. Sempre trazendo qualidade, estilo e aquele atendimento que faz você querer voltar.
         </p>
@@ -98,70 +95,65 @@
 
     <!-- Seções de Produtos -->
     
-    <!-- 1. CAMISAS (De Time incluídas no Título) -->
     <section id="camisas" class="category-section">
         <h2 class="category-title">Camisas <span>De Time & Oversized</span></h2>
         <div class="grid" id="camisas-grid">
-            <div class="card skeleton" style="height: 250px;"></div>
-            <div class="card skeleton" style="height: 250px;"></div>
-            <div class="card skeleton" style="height: 250px;"></div>
-            <div class="card skeleton" style="height: 250px;"></div>
+            <div class="card skeleton"></div>
+            <div class="card skeleton"></div>
+            <div class="card skeleton"></div>
+            <div class="card skeleton"></div>
         </div>
     </section>
 
-    <!-- 2. TÊNIS (Movido para baixo de Camisas e com a classe scroll-horizontal adicionada) -->
     <section id="tenis" class="category-section">
         <h2 class="category-title">Tênis <span>Sneakers Exclusivos</span></h2>
-        <!-- A classe scroll-horizontal foi adicionada. O ID foi mantido para o seu JS funcionar perfeitamente -->
         <div class="scroll-horizontal" id="tenis-grid">
-            <div class="card skeleton" style="height: 250px;"></div>
-            <div class="card skeleton" style="height: 250px;"></div>
-            <div class="card skeleton" style="height: 250px;"></div>
-            <div class="card skeleton" style="height: 250px;"></div>
-            <!-- Adicionei mais skeletons de exemplo para já ver o scroll funcionando -->
-            <div class="card skeleton" style="height: 250px;"></div>
-            <div class="card skeleton" style="height: 250px;"></div>
+            <div class="card skeleton"></div>
+            <div class="card skeleton"></div>
+            <div class="card skeleton"></div>
+            <div class="card skeleton"></div>
+            <div class="card skeleton"></div>
+            <div class="card skeleton"></div>
         </div>
     </section>
 
-    <!-- DEMAIS CATEGORIAS -->
     <section id="blusas" class="category-section">
         <h2 class="category-title">Blusas <span>Hoodies & Sweaters</span></h2>
         <div class="grid" id="blusas-grid">
-            <div class="card skeleton" style="height: 250px;"></div>
-            <div class="card skeleton" style="height: 250px;"></div>
-            <div class="card skeleton" style="height: 250px;"></div>
-            <div class="card skeleton" style="height: 250px;"></div>
+            <div class="card skeleton"></div>
+            <div class="card skeleton"></div>
+            <div class="card skeleton"></div>
+            <div class="card skeleton"></div>
         </div>
     </section>
 
     <section id="calcas" class="category-section">
         <h2 class="category-title">Calças <span>Cargos & Parachutes</span></h2>
         <div class="grid" id="calcas-grid">
-            <div class="card skeleton" style="height: 250px;"></div>
-            <div class="card skeleton" style="height: 250px;"></div>
-            <div class="card skeleton" style="height: 250px;"></div>
-            <div class="card skeleton" style="height: 250px;"></div>
+            <div class="card skeleton"></div>
+            <div class="card skeleton"></div>
+            <div class="card skeleton"></div>
+            <div class="card skeleton"></div>
         </div>
     </section>
 
     <section id="conjuntos" class="category-section">
         <h2 class="category-title">Conjuntos <span>Full Fits</span></h2>
         <div class="grid" id="conjuntos-grid">
-            <div class="card skeleton" style="height: 250px;"></div>
-            <div class="card skeleton" style="height: 250px;"></div>
-            <div class="card skeleton" style="height: 250px;"></div>
-            <div class="card skeleton" style="height: 250px;"></div>
+            <div class="card skeleton"></div>
+            <div class="card skeleton"></div>
+            <div class="card skeleton"></div>
+            <div class="card skeleton"></div>
         </div>
     </section>
 
     <section id="bones" class="category-section">
         <h2 class="category-title">Bonés <span>Headwear Premium</span></h2>
         <div class="grid" id="bones-grid">
-            <div class="card skeleton" style="height: 250px;"></div>
-            <div class="card skeleton" style="height: 250px;"></div>
-            <div class="card skeleton" style="height: 250px;"></div>
-            <div class="card skeleton" style="height: 250px;"></div>
+            <div class="card skeleton"></div>
+            <div class="card skeleton"></div>
+            <div class="card skeleton"></div>
+            <div class="card skeleton"></div>
         </div>
     </section>
 
@@ -171,7 +163,7 @@
         <div class="testimonials-grid">
             <div class="testimonial-card">
                 <div class="testimonial-stars">★★★★★</div>
-                <p class="testimonial-text">"A camisa do Milan é surreal. Caimento perfeito ."</p>
+                <p class="testimonial-text">"A camisa do Milan é surreal. Caimento perfeito."</p>
                 <div class="testimonial-user"><strong>Matheus S.</strong><span class="testimonial-verified"></span></div>
             </div>
             <div class="testimonial-card">
@@ -217,9 +209,7 @@
                 <h4>Comunidade</h4>
                 <ul>
                     <li><a href="https://www.instagram.com/magnataimperium" target="_blank">Instagram</a></li>
-                    <li>
-  <a href="https://wa.me/5511913343593?text=Olá!%20Gostaria%20de%20tirar%20uma%20dúvida." target="_blank">Whatsapp</a>
-</li>
+                    <li><a href="https://wa.me/5511913343593?text=Olá!%20Gostaria%20de%20tirar%20uma%20dúvida." target="_blank">Whatsapp</a></li>
                 </ul>
             </div>
         </div>

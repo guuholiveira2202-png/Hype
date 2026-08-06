@@ -38,7 +38,7 @@
         }
 
         /* SCROLLBAR */
-        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
 
@@ -227,8 +227,8 @@
 
     <main class="main-content">
         
+        <!-- VISUALIZAÇÃO DE PEDIDOS -->
         <section id="view-pedidos" class="view-section active">
-            
             <div class="header-row">
                 <h1>DASHBOARD // VENDAS</h1>
                 <button class="btn-danger-glass" onclick="limparTodosPedidos()">[🗑️] Purge Data</button>
@@ -252,6 +252,7 @@
             <div id="order-list" class="order-list"></div>
         </section>
 
+        <!-- VISUALIZAÇÃO DE PRODUTOS -->
         <section id="view-produtos" class="view-section">
             <div class="header-row">
                 <h1>CATÁLOGO // DATABASE</h1>
@@ -307,7 +308,7 @@
                             </div>
                         </div>
 
-                        <!-- SELEÇÃO DE TAMANHOS: CALÇADOS (TÊNIS E CHINELOS) -->
+                        <!-- SELEÇÃO DE TAMANHOS: CALÇADOS -->
                         <div class="input-box full" id="box-tamanhos-calcados" style="display: none;">
                             <label>Tamanhos Disponíveis (Calçados / Tênis / Chinelos)</label>
                             <div class="size-options">
@@ -341,6 +342,26 @@
                 </form>
             </div>
 
+            <!-- ABAS DE FILTRO DE PRODUTOS POR CATEGORIA -->
+            <div class="admin-tabs" id="product-tabs">
+                <button class="tab-btn active" data-filter="todos">Todos</button>
+                <button class="tab-btn" data-filter="camisas">Camisas Casuais</button>
+                <button class="tab-btn" data-filter="camisas-time">Camisas de Time</button>
+                <button class="tab-btn" data-filter="agasalhos">Agasalhos</button>
+                <button class="tab-btn" data-filter="calcas-cargo">Calças Cargo</button>
+                <button class="tab-btn" data-filter="calcas-alfaiataria">Alfaiataria</button>
+                <button class="tab-btn" data-filter="moletons">Moletons</button>
+                <button class="tab-btn" data-filter="calcas">Calças</button>
+                <button class="tab-btn" data-filter="conjuntos">Conjuntos</button>
+                <button class="tab-btn" data-filter="tenis">Tênis</button>
+                <button class="tab-btn" data-filter="chinelos">Chinelos</button>
+                <button class="tab-btn" data-filter="bones">Bonés</button>
+                <button class="tab-btn" data-filter="acessorios">Acessórios</button>
+                <button class="tab-btn" data-filter="perfumes">Perfumes</button>
+                <button class="tab-btn" data-filter="promocoes">Promoções</button>
+            </div>
+
+            <!-- LISTA DE PRODUTOS -->
             <div id="product-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px;"></div>
         </section>
 
@@ -376,7 +397,7 @@
             });
         });
 
-        // ================= FILTRO DE ABAS =================
+        // ================= FILTRO DE ABAS (PEDIDOS) =================
         let filtroAtual = 'todos';
 
         document.querySelectorAll('#order-tabs .tab-btn').forEach(btn => {
@@ -407,6 +428,32 @@
                     } else {
                         card.style.display = 'none';
                     }
+                }
+            });
+        }
+
+        // ================= FILTRO DE ABAS (PRODUTOS POR CATEGORIA) =================
+        let filtroProdutoAtual = 'todos';
+
+        document.querySelectorAll('#product-tabs .tab-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('#product-tabs .tab-btn').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                
+                filtroProdutoAtual = e.target.dataset.filter;
+                aplicarFiltroProdutos();
+            });
+        });
+
+        function aplicarFiltroProdutos() {
+            const productCards = document.querySelectorAll('.product-card');
+            productCards.forEach(card => {
+                const cardCat = card.dataset.categoria || '';
+                
+                if (filtroProdutoAtual === 'todos' || cardCat === filtroProdutoAtual) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
                 }
             });
         }
@@ -569,11 +616,9 @@
         const labelPreco = document.getElementById('label-preco');
         const inputPrecoOriginal = document.getElementById('prod-preco-original');
 
-        // Alterna campos visíveis dependendo da Categoria
         function atualizarVisibilidadeCampos() {
             const cat = catSelect.value;
 
-            // Preço Promocional
             if (cat === 'promocoes') {
                 boxPrecoOriginal.style.display = 'flex';
                 inputPrecoOriginal.required = true;
@@ -585,7 +630,6 @@
                 labelPreco.textContent = 'Preço Unitário (R$)';
             }
 
-            // Exibição dos Tamanhos
             if (['tenis', 'chinelos'].includes(cat)) {
                 boxTamanhosCalcados.style.display = 'flex';
                 boxTamanhosRoupas.style.display = 'none';
@@ -614,7 +658,6 @@
             return selecionados;
         }
 
-        // Submeter formulário
         formProd.addEventListener('submit', async (e) => {
             e.preventDefault();
             const btnSubmit = document.getElementById('btn-submit');
@@ -657,11 +700,16 @@
             }
         });
 
-        // Carregar produtos em tempo real
+        // CARREGAR PRODUTOS EM TEMPO REAL
         db.collection("produtos").orderBy("criadoEm", "desc").onSnapshot(snap => {
             const list = document.getElementById('product-list');
             list.innerHTML = "";
             window.produtosCache = {};
+
+            if (snap.empty) {
+                list.innerHTML = "<p style='color: var(--text-muted); grid-column: span 3;'>Nenhum produto cadastrado no catálogo.</p>";
+                return;
+            }
 
             snap.forEach(doc => {
                 const p = doc.data();
@@ -683,7 +731,7 @@
                     : 'Sem tamanhos';
 
                 list.innerHTML += `
-                    <div style="background:var(--glass-bg); padding:15px; border-radius:12px; border:1px solid var(--glass-border); display:flex; flex-direction:column; justify-content:space-between;">
+                    <div class="product-card" data-categoria="${p.categoria || ''}" style="background:var(--glass-bg); padding:15px; border-radius:12px; border:1px solid var(--glass-border); display:flex; flex-direction:column; justify-content:space-between;">
                         <div>
                             <img src="${p.img}" style="width:100%; aspect-ratio:1; object-fit:cover; border-radius:8px; margin-bottom:12px; border:1px solid rgba(255,255,255,0.05);">
                             <h4 style="font-size:0.85rem; margin-bottom:4px; color:#fff;">${p.nome}</h4>
@@ -698,6 +746,8 @@
                     </div>
                 `;
             });
+
+            aplicarFiltroProdutos();
         });
 
         function editProd(id) {
