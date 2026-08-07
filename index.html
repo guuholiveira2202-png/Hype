@@ -10,6 +10,226 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@500;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+
+    <!-- CSS EMBUTIDO: DESIGN ULTRA PREMIUM PARA FRETE E ELEMENTOS -->
+    <style>
+        :root {
+            --gold-primary: #d4af37;
+            --gold-light: #f3e5ab;
+            --gold-glow: rgba(212, 175, 55, 0.25);
+            --bg-dark: #0d0d0d;
+            --bg-card: #161616;
+            --border-glow: rgba(212, 175, 55, 0.2);
+            --text-muted: #a0a0a0;
+        }
+
+        /* Barra de Progresso do Frete Grátis */
+        .free-shipping-container {
+            background: linear-gradient(135deg, rgba(22,22,22,0.9), rgba(10,10,10,0.95));
+            border: 1px solid var(--border-glow);
+            border-radius: 8px;
+            padding: 12px 14px;
+            margin: 12px 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+        }
+
+        .free-shipping-text {
+            font-size: 0.75rem;
+            color: #fff;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .free-shipping-text strong {
+            color: var(--gold-primary);
+        }
+
+        .progress-bar-bg {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #d4af37, #f3e5ab);
+            width: 0%;
+            transition: width 0.4s ease-in-out;
+            box-shadow: 0 0 10px var(--gold-primary);
+        }
+
+        /* Caixa de Cálculo de Frete no Carrinho */
+        .cart-shipping-box-v2 {
+            padding: 16px;
+            background: #121212;
+            border-top: 1px solid rgba(255,255,255,0.08);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .shipping-title-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .shipping-title-row label {
+            font-size: 0.73rem;
+            color: var(--gold-light);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+        }
+
+        .shipping-origin-badge {
+            font-size: 0.65rem;
+            background: rgba(212, 175, 55, 0.12);
+            color: var(--gold-primary);
+            padding: 2px 8px;
+            border-radius: 12px;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+        }
+
+        .cep-input-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        .cep-input-group input {
+            flex: 1;
+            background: #1a1a1a;
+            border: 1px solid rgba(255,255,255,0.15);
+            color: #fff;
+            padding: 10px 12px;
+            border-radius: 6px;
+            font-size: 0.82rem;
+            outline: none;
+            transition: border 0.3s ease;
+        }
+
+        .cep-input-group input:focus {
+            border-color: var(--gold-primary);
+            box-shadow: 0 0 8px var(--gold-glow);
+        }
+
+        .btn-calc-frete {
+            background: linear-gradient(135deg, #d4af37, #b8962e);
+            color: #000;
+            border: none;
+            padding: 10px 16px;
+            font-weight: 800;
+            font-size: 0.72rem;
+            border-radius: 6px;
+            cursor: pointer;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-calc-frete:hover {
+            transform: translateY(-1px);
+            filter: brightness(1.1);
+        }
+
+        /* Options do Frete (PAC e SEDEX Selectable Cards) */
+        .shipping-options-wrapper {
+            margin-top: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .freight-option-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 12px;
+            background: #1a1a1a;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .freight-option-card:hover, .freight-option-card.selected {
+            border-color: var(--gold-primary);
+            background: rgba(212, 175, 55, 0.06);
+        }
+
+        .freight-option-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .freight-radio-custom {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .freight-option-card.selected .freight-radio-custom {
+            border-color: var(--gold-primary);
+        }
+
+        .freight-option-card.selected .freight-radio-custom::after {
+            content: '';
+            width: 7px;
+            height: 7px;
+            background: var(--gold-primary);
+            border-radius: 50%;
+        }
+
+        .freight-info-title {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: #fff;
+            display: block;
+        }
+
+        .freight-info-prazo {
+            font-size: 0.68rem;
+            color: var(--text-muted);
+        }
+
+        .freight-price-val {
+            font-size: 0.82rem;
+            font-weight: 800;
+            color: var(--gold-light);
+        }
+
+        .shipping-address-info {
+            font-size: 0.7rem;
+            color: var(--gold-primary);
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Spinner Loading */
+        .loader-spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: var(--gold-primary);
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
 </head>
     
 <body>
@@ -45,7 +265,6 @@
 
     <!-- Hero Section -->
     <section id="hero">
-        <!-- SOMENTE ESTA LOGO FOI ALTERADA (Substituindo o H1) -->
         <img src="https://scontent-gru2-2.xx.fbcdn.net/v/t1.15752-9/756682778_1768614744328024_4516698446308594190_n.jpg?stp=dst-jpg_s960x960_tt6&_nc_cat=106&ccb=1-7&_nc_sid=9f807c&_nc_ohc=AmMyavL3W5YQ7kNvwHAsI2h&_nc_oc=Ado4swuVwnCTdoI_qhgciIK7qfSuU_8Wzfyfo2NfVjn7gfJxmzpJSHzEmCCikrew4qY&_nc_zt=23&_nc_ht=scontent-gru2-2.xx&_nc_ss=7b6a8&oh=03_Q7cD6AE_7H8H69DYRJj7rW82u8nG7OAjNq6uSoJMK1Y4UKSbng&oe=6A9BB2C2" alt="Magnata Imperium Logo" class="hero-logo">
         
         <p>A MAGNATA IMPERIUM🦅 chegou. <br> <br>
@@ -60,7 +279,6 @@
                 <small></small>
             </div>
             <div class="promo-carousel">
-                <!-- Promoção 1 -->
                 <a href="#camisas" class="promo-card">
                     <img src="https://scontent-gru2-1.xx.fbcdn.net/v/t1.15752-9/759039607_2128385391418331_3891957921703457709_n.jpg?stp=dst-jpg_s960x960_tt6&_nc_cat=109&ccb=1-7&_nc_sid=9f807c&_nc_ohc=nFHEtThIPGoQ7kNvwFQ5Fb2&_nc_oc=Ado0QeAUacy314jiIqomd3ulcUXdIei8b4oj2xMKfKjcyByYnEzURlWRvAeJJSswdwo&_nc_zt=23&_nc_ht=scontent-gru2-1.xx&_nc_ss=7b6a8&oh=03_Q7cD6AEz3XMPX-cMJO42xbL8x7g6VjIDP9aoP705LcPM-KGJmQ&oe=6A919F12" alt="Promoção Camisetas">
                     <div class="promo-content">
@@ -70,7 +288,6 @@
                     </div>
                 </a>
 
-                <!-- Promoção 2 -->
                 <a href="#conjuntos" class="promo-card">
                     <img src="https://scontent-gru2-2.xx.fbcdn.net/v/t1.15752-9/756958997_3704060449758346_6574816417812928921_n.jpg?stp=dst-jpg_s960x960_tt6&_nc_cat=105&ccb=1-7&_nc_sid=9f807c&_nc_ohc=sL5U6lApf-kQ7kNvwGrjOIp&_nc_oc=AdqE0AgRbXhdctdWkhykD2cwnSzqMMOvRTFToazjeOu6SSSUNBA1vUt96S4-swvzFbA&_nc_zt=23&_nc_ht=scontent-gru2-2.xx&_nc_ss=7b6a8&oh=03_Q7cD6AFwaovHRkOhH3HsFzitlZbs0nuMCMDUcNwGCphtufFTrw&oe=6A91CFDD" alt="Promoção VIP">
                     <div class="promo-content">
@@ -80,7 +297,6 @@
                     </div>
                 </a>
 
-                <!-- Promoção 3 -->
                 <a href="#perfumes" class="promo-card">
                     <img src="https://scontent-gru1-1.xx.fbcdn.net/v/t1.15752-9/758422593_2060116381259220_4621337711934183479_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=9f807c&_nc_ohc=DUiGswOmk-EQ7kNvwHgnloV&_nc_oc=Adpfo3S9tTlmTmqL7I1bj0fqsgdGoVL0umEfZ9XvmXnioTvkX9XrJ5wFaaU9KNb1Ttw&_nc_zt=23&_nc_ht=scontent-gru1-1.xx&_nc_ss=7b6a8&oh=03_Q7cD6AH4_NQjxIFaC_MmEYwdXuCRy_pwdiTdt6dEds0Ywi5Mdw&oe=6A91D2FC" alt="Frete Grátis">
                     <div class="promo-content">
@@ -94,7 +310,6 @@
     </section>
 
     <!-- Seções de Produtos -->
-    
     <section id="camisas" class="category-section">
         <h2 class="category-title">Camisas <span>De Time & Oversized</span></h2>
         <div class="grid" id="camisas-grid">
@@ -185,6 +400,7 @@
             <div class="footer-col">
                 <a href="#" class="logo" style="display:inline-block; margin-bottom:16px; font-size: 1.2rem;">IMPERIUM<span>.</span></a>
                 <p style="color: var(--text-secondary); font-size: 0.82rem; max-width: 250px; line-height: 1.6;">Ditando a cultura através de design visionário e construção de altíssimo nível.</p>
+                <p style="color: var(--gold-primary); font-size: 0.72rem; margin-top: 8px;">📍 Hub de envios: Itapevi / SP (CEP 06653-550)</p>
             </div>
             <div class="footer-col">
                 <h4>Categorias</h4>
@@ -224,13 +440,51 @@
             <h2>Shopping Bag</h2>
             <button class="close-btn" onclick="toggleCart()">&times;</button>
         </div>
-        <div class="cart-items" id="cart-items"></div>
-        <div class="cart-footer">
-            <div class="total-row">
-                <span>Total</span>
-                <span id="cart-total">R$ 0,00</span>
+
+        <!-- BARRA DE PROGRESSO DO FRETE GRÁTIS -->
+        <div class="free-shipping-container">
+            <div class="free-shipping-text">
+                <span id="free-shipping-msg">Adicione produtos para Frete Grátis</span>
+                <strong id="free-shipping-value">R$ 299,00</strong>
             </div>
-            <button class="btn-header gold-btn" style="width: 100%; padding: 16px; border-radius: var(--radius-sm); font-size: 0.8rem;" onclick="openCheckoutModal()">FINALIZAR COMPRA</button>
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="free-shipping-fill"></div>
+            </div>
+        </div>
+        
+        <div class="cart-items" id="cart-items"></div>
+
+        <!-- CÁLCULO DE FRETE REDESENHADO NO CARRINHO (Origem: Itapevi - 06653-550) -->
+        <div class="cart-shipping-box-v2">
+            <div class="shipping-title-row">
+                <label>Calcular Frete e Entrega</label>
+                <span class="shipping-origin-badge">Origem: Itapevi-SP</span>
+            </div>
+            <div class="cep-input-group">
+                <input type="text" id="cart-cep" placeholder="00000-000" maxlength="9" oninput="mascaraCEP(this)">
+                <button type="button" class="btn-calc-frete" id="btn-calc-frete-action" onclick="calcularFreteCarrinho()">CALCULAR</button>
+            </div>
+            
+            <div id="cart-shipping-feedback"></div>
+            
+            <!-- LISTA DE OPÇÕES SELECIONÁVEIS CARREGADAS VIA JS -->
+            <div class="shipping-options-wrapper" id="cart-shipping-options" style="display: none;"></div>
+        </div>
+
+        <div class="cart-footer">
+            <div class="total-row" style="margin-bottom: 6px;">
+                <span style="font-size: 0.8rem; color: var(--text-muted);">Subtotal</span>
+                <span id="cart-subtotal" style="font-size: 0.9rem; color: #fff;">R$ 0,00</span>
+            </div>
+            <div class="total-row" style="margin-bottom: 10px;">
+                <span style="font-size: 0.8rem; color: var(--text-muted);">Frete Selecionado</span>
+                <span id="cart-frete-val" style="font-size: 0.9rem; color: var(--gold-light); font-weight: 700;">R$ 0,00</span>
+            </div>
+            <div class="total-row" style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; margin-bottom: 16px;">
+                <span style="font-weight: 800; font-size: 0.95rem;">Total Final</span>
+                <span id="cart-total" style="font-weight: 800; color: var(--gold-primary); font-size: 1.15rem;">R$ 0,00</span>
+            </div>
+            <button class="btn-header gold-btn" style="width: 100%; padding: 16px; border-radius: var(--radius-sm); font-size: 0.8rem; font-weight: 800;" onclick="openCheckoutModal()">FINALIZAR COMPRA</button>
         </div>
     </div>
 
@@ -277,7 +531,7 @@
             <button class="close-btn" style="font-size: 1.3rem;" onclick="closeAllModals()">&times;</button>
         </div>
         <form id="checkout-form">
-            <h4 style="color: var(--accent); margin-bottom: 12px; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px;">1. Dados Pessoais</h4>
+            <h4 style="color: var(--gold-primary); margin-bottom: 12px; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px;">1. Dados Pessoais</h4>
             <div class="form-group">
                 <label>Nome Completo</label>
                 <input type="text" id="checkout-nome" class="form-control" placeholder="Seu nome completo" required>
@@ -293,11 +547,11 @@
                 </div>
             </div>
 
-            <h4 style="color: var(--accent); margin: 16px 0 12px; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px;">2. Endereço de Entrega</h4>
+            <h4 style="color: var(--gold-primary); margin: 16px 0 12px; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px;">2. Endereço de Entrega & Frete</h4>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                 <div class="form-group">
                     <label>CEP (Busca Automática)</label>
-                    <input type="text" id="checkout-cep" class="form-control" placeholder="00000-000" maxlength="9" onblur="buscarCEP()" required>
+                    <input type="text" id="checkout-cep" class="form-control" placeholder="00000-000" maxlength="9" oninput="mascaraCEP(this)" onblur="buscarCEP()" required>
                 </div>
                 <div class="form-group">
                     <label>Número</label>
@@ -323,24 +577,43 @@
                 <input type="text" id="checkout-complemento" class="form-control" placeholder="Apto, Bloco, Casa, etc.">
             </div>
 
-            <h4 style="color: var(--accent); margin: 16px 0 12px; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px;">3. Forma de Pagamento</h4>
+            <!-- OPÇÃO DE ENVIOS NO CHECKOUT SINCRO COM CARRINHO -->
+            <div class="form-group" style="margin-top: 12px;">
+                <label>Opções de Envio</label>
+                <select id="checkout-frete-opcao" class="form-control" onchange="alterarFreteSelectCheckout()" required>
+                    <option value="15.00">Digite o CEP para ver as opções...</option>
+                </select>
+            </div>
+
+            <h4 style="color: var(--gold-primary); margin: 16px 0 12px; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px;">3. Forma de Pagamento</h4>
             <div class="form-group">
                 <label>Selecione o Método</label>
                 <select id="checkout-pagamento" class="form-control" onchange="updatePaymentInfo()" required>
                     <option value="PIX">PIX (Aprovação Instantânea)</option>
-                    <option value="Cartão de Crédito">Cartão de Crédito </option>
+                    <option value="Cartão de Crédito">Cartão de Crédito</option>
                     <option value="Boleto Bancário">Boleto Bancário</option>
                 </select>
             </div>
 
             <div id="payment-details-container"></div>
 
-            <div style="background: var(--bg); padding: 14px; border-radius: var(--radius-sm); margin: 16px 0; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--border-subtle);">
-                <span style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 700;">Total do Pedido:</span>
-                <span id="checkout-total-val" style="color: var(--accent); font-family: 'Syne', sans-serif; font-size: 1.2rem; font-weight: 700;">R$ 0,00</span>
+            <!-- RESUMO FINAL COM DETALHAMENTO DE FRETE -->
+            <div style="background: #121212; padding: 14px; border-radius: var(--radius-sm); margin: 16px 0; border: 1px solid rgba(255,255,255,0.08);">
+                <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 6px;">
+                    <span>Subtotal Produtos:</span>
+                    <span id="checkout-subtotal-val">R$ 0,00</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">
+                    <span>Frete Selecionado:</span>
+                    <span id="checkout-frete-display" style="color: var(--gold-light);">R$ 0,00</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 8px;">
+                    <span style="font-size: 0.8rem; color: #fff; text-transform: uppercase; font-weight: 700;">Total Final do Pedido:</span>
+                    <span id="checkout-total-val" style="color: var(--gold-primary); font-family: 'Syne', sans-serif; font-size: 1.2rem; font-weight: 800;">R$ 0,00</span>
+                </div>
             </div>
 
-            <button type="submit" class="btn-header gold-btn" style="width: 100%; padding: 16px; border-radius: var(--radius-sm);">CONFIRMAR E FINALIZAR PEDIDO</button>
+            <button type="submit" class="btn-header gold-btn" style="width: 100%; padding: 16px; border-radius: var(--radius-sm); font-weight: 800;">CONFIRMAR E FINALIZAR PEDIDO</button>
         </form>
     </div>
 
@@ -352,6 +625,328 @@
         </div>
         <div class="support-content" id="support-content"></div>
     </div>
+
+    <!-- LÓGICA DE NEGÓCIO E FRETE EM JAVASCRIPT -->
+    <script>
+        // CONFIGURAÇÕES DA LOJA (Hub: Itapevi - SP)
+        const ORIGEM = {
+            cep: "06653550",
+            cidade: "Itapevi",
+            uf: "SP"
+        };
+
+        const VALOR_FRETE_GRATIS = 299.00;
+
+        let subtotalCarrinho = 180.00; // Valor de exemplo/teste inicial
+        let valorFreteAtual = 0;
+        let opcaoFreteSelecionada = 'pac';
+        let dadosFreteCalculados = null;
+
+        // Executa ao inicializar a página
+        document.addEventListener('DOMContentLoaded', () => {
+            atualizarBarraFreteGratis();
+            atualizarValoresTotais();
+        });
+
+        // Máscara Automática de CEP
+        function mascaraCEP(input) {
+            let v = input.value.replace(/\D/g, '');
+            if (v.length > 5) {
+                v = v.substring(0, 5) + '-' + v.substring(5, 8);
+            }
+            input.value = v;
+        }
+
+        // Atualiza a barra visual de Frete Grátis
+        function atualizarBarraFreteGratis() {
+            const fill = document.getElementById('free-shipping-fill');
+            const msg = document.getElementById('free-shipping-msg');
+            const valDisplay = document.getElementById('free-shipping-value');
+
+            let porcentagem = (subtotalCarrinho / VALOR_FRETE_GRATIS) * 100;
+            if (porcentagem > 100) porcentagem = 100;
+
+            fill.style.width = `${porcentagem}%`;
+
+            if (subtotalCarrinho >= VALOR_FRETE_GRATIS) {
+                msg.innerHTML = "🎉 PARABÉNS! VOCÊ GANHOU";
+                valDisplay.innerText = "FRETE GRÁTIS";
+            } else {
+                let restante = VALOR_FRETE_GRATIS - subtotalCarrinho;
+                msg.innerHTML = "Faltam apenas";
+                valDisplay.innerText = `R$ ${restante.toFixed(2).replace('.', ',')}`;
+            }
+        }
+
+        // Cálculo de Tabela de Frete com Origem em Itapevi - SP
+        function calcularValoresRegiao(uf, localidade) {
+            // Regra de Frete Grátis
+            if (subtotalCarrinho >= VALOR_FRETE_GRATIS) {
+                return {
+                    pac: { tipo: 'pac', nome: 'PAC (Frete Grátis)', valor: 0, prazo: '3 a 6 dias úteis' },
+                    sedex: { tipo: 'sedex', nome: 'SEDEX Express', valor: 14.90, prazo: '1 a 2 dias úteis' }
+                };
+            }
+
+            // Entrega Local (Itapevi)
+            if (localidade.toLowerCase() === 'itapevi') {
+                return {
+                    pac: { tipo: 'pac', nome: 'Entrega Local Itapevi', valor: 7.90, prazo: 'Até 24 horas' },
+                    sedex: { tipo: 'sedex', nome: 'Flash / MotoBoy', valor: 12.00, prazo: 'Mesmo Dia' }
+                };
+            }
+
+            // Estado de São Paulo
+            if (uf === 'SP') {
+                return {
+                    pac: { tipo: 'pac', nome: 'PAC Padrão SP', valor: 14.90, prazo: '2 a 4 dias úteis' },
+                    sedex: { tipo: 'sedex', nome: 'SEDEX Express', valor: 21.90, prazo: '1 a 2 dias úteis' }
+                };
+            }
+
+            // Sudeste (RJ, MG, ES)
+            if (['RJ', 'MG', 'ES'].includes(uf)) {
+                return {
+                    pac: { tipo: 'pac', nome: 'PAC Sudeste', valor: 19.90, prazo: '4 a 6 dias úteis' },
+                    sedex: { tipo: 'sedex', nome: 'SEDEX Sudeste', valor: 32.90, prazo: '2 a 3 dias úteis' }
+                };
+            }
+
+            // Sul / Centro-Oeste
+            if (['PR', 'SC', 'RS', 'MS', 'MT', 'GO', 'DF'].includes(uf)) {
+                return {
+                    pac: { tipo: 'pac', nome: 'PAC Brasil', valor: 25.90, prazo: '5 a 8 dias úteis' },
+                    sedex: { tipo: 'sedex', nome: 'SEDEX Brasil', valor: 42.90, prazo: '2 a 4 dias úteis' }
+                };
+            }
+
+            // Norte / Nordeste
+            return {
+                pac: { tipo: 'pac', nome: 'PAC Brasil', valor: 34.90, prazo: '7 a 12 dias úteis' },
+                sedex: { tipo: 'sedex', nome: 'SEDEX Express', valor: 58.90, prazo: '3 a 5 dias úteis' }
+            };
+        }
+
+        // Função de busca ao clicar em CALCULAR no Carrinho
+        async function calcularFreteCarrinho() {
+            const cepInput = document.getElementById('cart-cep').value.replace(/\D/g, '');
+            const feedback = document.getElementById('cart-shipping-feedback');
+            const optionsWrapper = document.getElementById('cart-shipping-options');
+            const btnCalc = document.getElementById('btn-calc-frete-action');
+
+            if (cepInput.length !== 8) {
+                feedback.innerHTML = `<span style="color:#ff4d4d; font-size:0.72rem; margin-top:6px; display:block;">⚠️ Digite um CEP válido com 8 dígitos.</span>`;
+                optionsWrapper.style.display = 'none';
+                return;
+            }
+
+            btnCalc.innerHTML = `<span class="loader-spinner"></span>`;
+            feedback.innerHTML = `<span style="color:var(--text-muted); font-size:0.72rem; margin-top:6px; display:block;">Buscando rota de entrega...</span>`;
+
+            try {
+                const response = await fetch(`https://viacep.com.br/ws/${cepInput}/json/`);
+                const data = await response.json();
+
+                btnCalc.innerHTML = `CALCULAR`;
+
+                if (data.erro) {
+                    feedback.innerHTML = `<span style="color:#ff4d4d; font-size:0.72rem; margin-top:6px; display:block;">❌ CEP não encontrado.</span>`;
+                    optionsWrapper.style.display = 'none';
+                    return;
+                }
+
+                dadosFreteCalculados = calcularValoresRegiao(data.uf, data.localidade);
+
+                feedback.innerHTML = `
+                    <div class="shipping-address-info">
+                        📍 Envio para ${data.localidade} - ${data.uf} (${data.bairro || 'Centro'})
+                    </div>
+                `;
+
+                // Renderiza Cards Interativos de Frete
+                renderizarCardsFrete(dadosFreteCalculados);
+                
+                // Preenche dados para o Checkout
+                document.getElementById('checkout-cep').value = document.getElementById('cart-cep').value;
+                document.getElementById('checkout-rua').value = data.logradouro || '';
+                document.getElementById('checkout-bairro').value = data.bairro || '';
+                document.getElementById('checkout-cidade').value = `${data.localidade} - ${data.uf}`;
+                preencherSelectCheckout(dadosFreteCalculados);
+
+            } catch (err) {
+                btnCalc.innerHTML = `CALCULAR`;
+                feedback.innerHTML = `<span style="color:#ff4d4d; font-size:0.72rem; margin-top:6px; display:block;">Falha ao consultar CEP. Tente novamente.</span>`;
+            }
+        }
+
+        // Renderiza as opções em formato de CARDS interativos
+        function renderizarCardsFrete(fretes) {
+            const wrapper = document.getElementById('cart-shipping-options');
+            wrapper.style.display = 'flex';
+
+            // Por padrão seleciona o PAC
+            const opPac = fretes.pac;
+            const opSedex = fretes.sedex;
+
+            valorFreteAtual = opPac.valor;
+            opcaoFreteSelecionada = 'pac';
+
+            wrapper.innerHTML = `
+                <div class="freight-option-card selected" id="card-frete-pac" onclick="selecionarOpcaoFrete('pac', ${opPac.valor})">
+                    <div class="freight-option-left">
+                        <div class="freight-radio-custom"></div>
+                        <div>
+                            <span class="freight-info-title">${opPac.nome}</span>
+                            <span class="freight-info-prazo">${opPac.prazo}</span>
+                        </div>
+                    </div>
+                    <div class="freight-price-val">
+                        ${opPac.valor === 0 ? 'GRÁTIS' : 'R$ ' + opPac.valor.toFixed(2).replace('.', ',')}
+                    </div>
+                </div>
+
+                <div class="freight-option-card" id="card-frete-sedex" onclick="selecionarOpcaoFrete('sedex', ${opSedex.valor})">
+                    <div class="freight-option-left">
+                        <div class="freight-radio-custom"></div>
+                        <div>
+                            <span class="freight-info-title">⚡ ${opSedex.nome}</span>
+                            <span class="freight-info-prazo">${opSedex.prazo}</span>
+                        </div>
+                    </div>
+                    <div class="freight-price-val">
+                        R$ ${opSedex.valor.toFixed(2).replace('.', ',')}
+                    </div>
+                </div>
+            `;
+
+            atualizarValoresTotais();
+        }
+
+        // Seleciona opção de frete diretamente no card
+        function selecionarOpcaoFrete(tipo, valor) {
+            opcaoFreteSelecionada = tipo;
+            valorFreteAtual = valor;
+
+            document.querySelectorAll('.freight-option-card').forEach(c => c.classList.remove('selected'));
+            const cardAlvo = document.getElementById(`card-frete-${tipo}`);
+            if (cardAlvo) cardAlvo.classList.add('selected');
+
+            // Atualiza select do Checkout
+            const selectCheckout = document.getElementById('checkout-frete-opcao');
+            if (selectCheckout) selectCheckout.value = valor.toFixed(2);
+
+            atualizarValoresTotais();
+        }
+
+        // Atualiza a sincronização de totais em toda a interface
+        function atualizarValoresTotais() {
+            const cartSubtotalEl = document.getElementById('cart-subtotal');
+            const cartFreteEl = document.getElementById('cart-frete-val');
+            const cartTotalEl = document.getElementById('cart-total');
+
+            const checkoutSubtotalEl = document.getElementById('checkout-subtotal-val');
+            const checkoutFreteEl = document.getElementById('checkout-frete-display');
+            const checkoutTotalEl = document.getElementById('checkout-total-val');
+
+            const totalFinal = subtotalCarrinho + valorFreteAtual;
+
+            const strSubtotal = `R$ ${subtotalCarrinho.toFixed(2).replace('.', ',')}`;
+            const strFrete = valorFreteAtual === 0 ? 'GRÁTIS' : `R$ ${valorFreteAtual.toFixed(2).replace('.', ',')}`;
+            const strTotal = `R$ ${totalFinal.toFixed(2).replace('.', ',')}`;
+
+            if (cartSubtotalEl) cartSubtotalEl.innerText = strSubtotal;
+            if (cartFreteEl) cartFreteEl.innerText = strFrete;
+            if (cartTotalEl) cartTotalEl.innerText = strTotal;
+
+            if (checkoutSubtotalEl) checkoutSubtotalEl.innerText = strSubtotal;
+            if (checkoutFreteEl) checkoutFreteEl.innerText = strFrete;
+            if (checkoutTotalEl) checkoutTotalEl.innerText = strTotal;
+        }
+
+        // Popula as opções do Select na modal de Checkout
+        function preencherSelectCheckout(fretes) {
+            const select = document.getElementById('checkout-frete-opcao');
+            select.innerHTML = `
+                <option value="${fretes.pac.valor.toFixed(2)}">${fretes.pac.nome} (${fretes.pac.prazo}) - ${fretes.pac.valor === 0 ? 'GRÁTIS' : 'R$ ' + fretes.pac.valor.toFixed(2).replace('.', ',')}</option>
+                <option value="${fretes.sedex.valor.toFixed(2)}">${fretes.sedex.nome} (${fretes.sedex.prazo}) - R$ ${fretes.sedex.valor.toFixed(2).replace('.', ',')}</option>
+            `;
+            select.value = valorFreteAtual.toFixed(2);
+        }
+
+        function alterarFreteSelectCheckout() {
+            const select = document.getElementById('checkout-frete-opcao');
+            valorFreteAtual = parseFloat(select.value) || 0;
+            atualizarValoresTotais();
+        }
+
+        // Função chamada no OnBlur do CEP no Checkout
+        async function buscarCEP() {
+            const cepInput = document.getElementById('checkout-cep').value.replace(/\D/g, '');
+            if (cepInput.length !== 8) return;
+
+            try {
+                const response = await fetch(`https://viacep.com.br/ws/${cepInput}/json/`);
+                const data = await response.json();
+
+                if (!data.erro) {
+                    document.getElementById('checkout-rua').value = data.logradouro || '';
+                    document.getElementById('checkout-bairro').value = data.bairro || '';
+                    document.getElementById('checkout-cidade').value = `${data.localidade} - ${data.uf}`;
+
+                    dadosFreteCalculados = calcularValoresRegiao(data.uf, data.localidade);
+                    preencherSelectCheckout(dadosFreteCalculados);
+                    valorFreteAtual = dadosFreteCalculados.pac.valor;
+                    atualizarValoresTotais();
+                }
+            } catch (err) {
+                console.error("Erro busca CEP checkout", err);
+            }
+        }
+
+        // Funções de Interface das Modais e Gaveta
+        function closeAllModals() {
+            document.querySelectorAll('.modal-center').forEach(m => m.style.display = 'none');
+            const overlay = document.getElementById('overlay');
+            if (overlay) overlay.style.display = 'none';
+        }
+
+        function toggleCart() {
+            const sidebar = document.getElementById('cart-sidebar');
+            if (sidebar) sidebar.classList.toggle('open');
+        }
+
+        function openCheckoutModal() {
+            closeAllModals();
+            const modal = document.getElementById('checkout-modal');
+            const overlay = document.getElementById('overlay');
+            if (modal) modal.style.display = 'block';
+            if (overlay) overlay.style.display = 'block';
+        }
+
+        function openLoginModal() {
+            closeAllModals();
+            const modal = document.getElementById('login-modal');
+            const overlay = document.getElementById('overlay');
+            if (modal) modal.style.display = 'block';
+            if (overlay) overlay.style.display = 'block';
+        }
+
+        function updatePaymentInfo() {
+            const metodo = document.getElementById('checkout-pagamento').value;
+            const container = document.getElementById('payment-details-container');
+            if (!container) return;
+
+            if (metodo === 'PIX') {
+                container.innerHTML = `<p style="font-size: 0.75rem; color: var(--gold-primary); margin-top: 8px;">✓ Chave PIX gerada com 5% de desconto extra na tela final.</p>`;
+            } else if (metodo === 'Cartão de Crédito') {
+                container.innerHTML = `<p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 8px;">Parcelei em até 10x sem juros no cartão.</p>`;
+            } else {
+                container.innerHTML = `<p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 8px;">Boleto com vencimento em 3 dias úteis.</p>`;
+            }
+        }
+    </script>
+
+
 
 
 <!-- Script Principal: Firebase, Catálogo, Promoções, Login, Carrinho & Checkout -->
