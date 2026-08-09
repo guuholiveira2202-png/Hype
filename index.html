@@ -41,6 +41,7 @@
         <a href="#conjuntos" class="quick-select-btn">Conjuntos</a>
         <a href="#promocoes-grid" class="quick-select-btn">Promoções</a>
         <a href="#bones-grid" class="quick-select-btn">Bonés</a>
+        <a href="#perfumes-grid" class="quick-select-btn">Acessorios</a>
     </nav>
 
     <!-- Hero Section -->
@@ -154,6 +155,16 @@
             <div class="card skeleton"></div>
             <div class="card skeleton"></div>
             <div class="card skeleton"></div>
+        </div>
+    </section>
+
+    <section id="perfumes" class="category-section">
+        <h2 class="category-title">Acessorios <span>Essencial Para o Estilo </span></h2>
+        <div class="grid" id="perfumes-grid">
+            <div class="card skeleton" style="height: 250px;"></div>
+            <div class="card skeleton" style="height: 250px;"></div>
+            <div class="card skeleton" style="height: 250px;"></div>
+            <div class="card skeleton" style="height: 250px;"></div>
         </div>
     </section>
 
@@ -1093,7 +1104,7 @@ function setupMaisVendidosDOM() {
         }
     }
 }
-// 👟 LÓGICA DE TÊNIS DEFINITIVA (REORDENAÇÃO FÍSICA NO DOM E ORDENAÇÃO POR PREÇO)
+// 👟 LÓGICA DE TÊNIS (ESTRUTURA DOM)
 function setupTenisDOM() {
     let grid = document.getElementById('tenis-grid');
     
@@ -1114,66 +1125,6 @@ function setupTenisDOM() {
             referenceSection.parentNode.insertBefore(tenisWrapper, referenceSection.nextSibling);
         } else {
             document.body.appendChild(tenisWrapper);
-        }
-        
-        grid = document.getElementById('tenis-grid');
-    }
-
-    if (grid) {
-        let timeoutId;
-        let observador;
-
-        const reordenarGridTenis = () => {
-            if (observador) observador.disconnect();
-
-            const cards = Array.from(grid.children);
-            if (cards.length > 1) {
-                grid.style.scrollSnapType = 'none';
-
-                const cardsComValores = cards.map(card => {
-                    const texto = card.innerText || card.textContent || "";
-                    const match = texto.match(/R\$\s*([\d\.,]+)/i);
-                    let valor = 0;
-                    
-                    if (match) {
-                        valor = parseFloat(match[1].replace(/\./g, '').replace(',', '.'));
-                    }
-                    return { card, valor };
-                });
-
-                cardsComValores.sort((a, b) => a.valor - b.valor);
-
-                cardsComValores.forEach(item => {
-                    grid.appendChild(item.card);
-                    item.card.style.order = '';
-                });
-
-                grid.scrollLeft = 0;
-
-                setTimeout(() => {
-                    grid.scrollLeft = 0;
-                    grid.style.scrollSnapType = 'x mandatory';
-                }, 50);
-            }
-
-            if (observador) observador.observe(grid, { childList: true });
-        };
-
-        observador = new MutationObserver((mutationsList) => {
-            const itensAdicionados = mutationsList.some(mutation => mutation.addedNodes.length > 0);
-            
-            if (itensAdicionados) {
-                clearTimeout(timeoutId);
-                timeoutId = setTimeout(() => {
-                    reordenarGridTenis();
-                }, 100); 
-            }
-        });
-
-        observador.observe(grid, { childList: true });
-        
-        if (grid.children.length > 0) {
-            reordenarGridTenis();
         }
     }
 }
@@ -1235,7 +1186,7 @@ function setupCalcasAlfaiatariaDOM() {
         wrapper.className = 'promocoes-wrapper';
         wrapper.id = 'calcas-alfaiataria-section-wrapper';
         wrapper.innerHTML = `
-            <h2 style="color: #ffffff;">👖 CALÇAS DE ALFAIATARIA</h2>
+            <h2 style="color: #ffffff;">👖 CUECAS</h2>
             <div id="calcas-alfaiataria-grid" class="promocoes-carousel-grid"></div>
         `;
 
@@ -1258,7 +1209,7 @@ function setupCalcasCargoDOM() {
         wrapper.className = 'promocoes-wrapper';
         wrapper.id = 'calcas-cargo-section-wrapper';
         wrapper.innerHTML = `
-            <h2 style="color: #ffffff;">👖 CALÇAS CARGO</h2>
+            <h2 style="color: #ffffff;">👖 Shorts</h2>
             <div id="calcas-cargo-grid" class="promocoes-carousel-grid"></div>
         `;
 
@@ -1270,9 +1221,10 @@ function setupCalcasCargoDOM() {
     }
 }
 
-// 🩴 CHINELOS (Posicionada abaixo de Agasalhos, com margem, ordenado por preço)
+// 🩴 CHINELOS (Posicionada abaixo de Agasalhos, com margem)
 function setupChinelosDOM() {
     let grid = document.getElementById('chinelos-grid');
+    
     if (!grid) {
         // Busca a seção de Agasalhos para colocar logo abaixo dela. Se não existir, tenta Blusas.
         const agasalhosGrid = document.getElementById('agasalhos-grid');
@@ -1300,71 +1252,14 @@ function setupChinelosDOM() {
 
         if (referenceSection && referenceSection.parentNode) {
             referenceSection.parentNode.insertBefore(chinelosWrapper, referenceSection.nextSibling);
-        } else {
+        } else if (document.body) {
             document.body.appendChild(chinelosWrapper);
         }
         
         grid = document.getElementById('chinelos-grid');
     }
 
-    if (grid) {
-        let timeoutId;
-        let observador;
-
-        const reordenarGridChinelos = () => {
-            if (observador) observador.disconnect();
-
-            const cards = Array.from(grid.children);
-            if (cards.length > 1) {
-                grid.style.scrollSnapType = 'none';
-
-                const cardsComValores = cards.map(card => {
-                    const texto = card.innerText || card.textContent || "";
-                    const match = texto.match(/R\$\s*([\d\.,]+)/i);
-                    let valor = 0;
-                    
-                    if (match) {
-                        valor = parseFloat(match[1].replace(/\./g, '').replace(',', '.'));
-                    }
-                    return { card, valor };
-                });
-
-                // Ordena do menor para o maior preço
-                cardsComValores.sort((a, b) => a.valor - b.valor);
-
-                cardsComValores.forEach(item => {
-                    grid.appendChild(item.card);
-                    item.card.style.order = '';
-                });
-
-                grid.scrollLeft = 0;
-
-                setTimeout(() => {
-                    grid.scrollLeft = 0;
-                    grid.style.scrollSnapType = 'x mandatory';
-                }, 50);
-            }
-
-            if (observador) observador.observe(grid, { childList: true });
-        };
-
-        observador = new MutationObserver((mutationsList) => {
-            const itensAdicionados = mutationsList.some(mutation => mutation.addedNodes.length > 0);
-            
-            if (itensAdicionados) {
-                clearTimeout(timeoutId);
-                timeoutId = setTimeout(() => {
-                    reordenarGridChinelos();
-                }, 100); 
-            }
-        });
-
-        observador.observe(grid, { childList: true });
-        
-        if (grid.children.length > 0) {
-            reordenarGridChinelos();
-        }
-    }
+    return grid;
 }
 
 // Ouvinte em tempo real do banco de dados
