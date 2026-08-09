@@ -271,16 +271,15 @@
                                 <option value="camisas">Camisas Casuais</option>
                                 <option value="camisas-time">Camisas de Time / Seleções</option>
                                 <option value="agasalhos">Agasalhos</option>
-                                <option value="calcas-cargo">Calças Cargo</option>
-                                <option value="calcas-alfaiataria">Calças de Alfaiataria</option>
+                                <option value="calcas-cargo">SHORTS</option>
+                                <option value="calcas-alfaiataria">CUECAS</option>
                                 <option value="moletons">Moletons</option>
                                 <option value="calcas">Calças</option>
                                 <option value="conjuntos">Conjuntos</option>
                                 <option value="tenis">Tênis</option>
                                 <option value="chinelos">Chinelos</option>
                                 <option value="bones">Bonés</option>
-                                <option value="acessorios">Acessórios</option>
-                                <option value="perfumes">Perfumes</option>
+                                <option value="perfumes">Acessórios</option>
                                 <option value="promocoes">Promoções</option>
                             </select>
                         </div>
@@ -308,6 +307,21 @@
                             </div>
                         </div>
 
+                        <!-- SELEÇÃO DE TAMANHOS: CALÇAS (NUMÉRICA) -->
+                        <div class="input-box full" id="box-tamanhos-calcas" style="display: none;">
+                            <label>Tamanhos Disponíveis (Calças - Numeração)</label>
+                            <div class="size-options">
+                                <input type="checkbox" id="sz-36" value="36" class="size-checkbox"><label for="sz-36" class="size-label">36</label>
+                                <input type="checkbox" id="sz-38" value="38" class="size-checkbox"><label for="sz-38" class="size-label">38</label>
+                                <input type="checkbox" id="sz-40" value="40" class="size-checkbox"><label for="sz-40" class="size-label">40</label>
+                                <input type="checkbox" id="sz-42" value="42" class="size-checkbox"><label for="sz-42" class="size-label">42</label>
+                                <input type="checkbox" id="sz-44" value="44" class="size-checkbox"><label for="sz-44" class="size-label">44</label>
+                                <input type="checkbox" id="sz-46" value="46" class="size-checkbox"><label for="sz-46" class="size-label">46</label>
+                                <input type="checkbox" id="sz-48" value="48" class="size-checkbox"><label for="sz-48" class="size-label">48</label>
+                                <input type="checkbox" id="sz-50" value="50" class="size-checkbox"><label for="sz-50" class="size-label">50</label>
+                            </div>
+                        </div>
+
                         <!-- SELEÇÃO DE TAMANHOS: CALÇADOS -->
                         <div class="input-box full" id="box-tamanhos-calcados" style="display: none;">
                             <label>Tamanhos Disponíveis (Calçados / Tênis / Chinelos)</label>
@@ -319,13 +333,21 @@
                                 <input type="checkbox" id="sz-4344" value="43/44" class="size-checkbox"><label for="sz-4344" class="size-label">43/44</label>
 
                                 <input type="checkbox" id="sz-37" value="37" class="size-checkbox"><label for="sz-37" class="size-label">37</label>
-                                <input type="checkbox" id="sz-38" value="38" class="size-checkbox"><label for="sz-38" class="size-label">38</label>
+                                <input type="checkbox" id="sz-38-shoe" value="38" class="size-checkbox"><label for="sz-38-shoe" class="size-label">38</label>
                                 <input type="checkbox" id="sz-39" value="39" class="size-checkbox"><label for="sz-39" class="size-label">39</label>
-                                <input type="checkbox" id="sz-40" value="40" class="size-checkbox"><label for="sz-40" class="size-label">40</label>
+                                <input type="checkbox" id="sz-40-shoe" value="40" class="size-checkbox"><label for="sz-40-shoe" class="size-label">40</label>
                                 <input type="checkbox" id="sz-41" value="41" class="size-checkbox"><label for="sz-41" class="size-label">41</label>
-                                <input type="checkbox" id="sz-42" value="42" class="size-checkbox"><label for="sz-42" class="size-label">42</label>
+                                <input type="checkbox" id="sz-42-shoe" value="42" class="size-checkbox"><label for="sz-42-shoe" class="size-label">42</label>
                                 <input type="checkbox" id="sz-43" value="43" class="size-checkbox"><label for="sz-43" class="size-label">43</label>
-                                <input type="checkbox" id="sz-44" value="44" class="size-checkbox"><label for="sz-44" class="size-label">44</label>
+                                <input type="checkbox" id="sz-44-shoe" value="44" class="size-checkbox"><label for="sz-44-shoe" class="size-label">44</label>
+                            </div>
+                        </div>
+
+                        <!-- SELEÇÃO DE TAMANHOS: ACESSÓRIOS -->
+                        <div class="input-box full" id="box-tamanhos-unico" style="display: none;">
+                            <label>Tamanho Disponível (Acessórios)</label>
+                            <div class="size-options">
+                                <input type="checkbox" id="sz-unico" value="Tamanho Único" class="size-checkbox" checked><label for="sz-unico" class="size-label">Tamanho Único</label>
                             </div>
                         </div>
 
@@ -356,8 +378,7 @@
                 <button class="tab-btn" data-filter="tenis">Tênis</button>
                 <button class="tab-btn" data-filter="chinelos">Chinelos</button>
                 <button class="tab-btn" data-filter="bones">Bonés</button>
-                <button class="tab-btn" data-filter="acessorios">Acessórios</button>
-                <button class="tab-btn" data-filter="perfumes">Perfumes</button>
+                <button class="tab-btn" data-filter="perfumes">Acessórios</button>
                 <button class="tab-btn" data-filter="promocoes">Promoções</button>
             </div>
 
@@ -613,12 +634,15 @@
         const boxPrecoOriginal = document.getElementById('box-preco-original');
         const boxTamanhosRoupas = document.getElementById('box-tamanhos-roupas');
         const boxTamanhosCalcados = document.getElementById('box-tamanhos-calcados');
+        const boxTamanhosCalcas = document.getElementById('box-tamanhos-calcas');
+        const boxTamanhosUnico = document.getElementById('box-tamanhos-unico');
         const labelPreco = document.getElementById('label-preco');
         const inputPrecoOriginal = document.getElementById('prod-preco-original');
 
         function atualizarVisibilidadeCampos() {
             const cat = catSelect.value;
 
+            // Lógica de Preço Promocional
             if (cat === 'promocoes') {
                 boxPrecoOriginal.style.display = 'flex';
                 inputPrecoOriginal.required = true;
@@ -630,18 +654,26 @@
                 labelPreco.textContent = 'Preço Unitário (R$)';
             }
 
+            // Oculta todas as opções de tamanhos por padrão
+            boxTamanhosRoupas.style.display = 'none';
+            boxTamanhosCalcados.style.display = 'none';
+            boxTamanhosCalcas.style.display = 'none';
+            boxTamanhosUnico.style.display = 'none';
+
+            // Exibe a caixa de tamanho apropriada
             if (['tenis', 'chinelos'].includes(cat)) {
                 boxTamanhosCalcados.style.display = 'flex';
-                boxTamanhosRoupas.style.display = 'none';
-            } else if (['camisas', 'camisas-time', 'agasalhos', 'calcas-cargo', 'calcas-alfaiataria', 'moletons', 'calcas', 'conjuntos'].includes(cat)) {
+            } else if (['calcas', 'calcas-cargo', 'calcas-alfaiataria'].includes(cat)) {
+                boxTamanhosCalcas.style.display = 'flex';
+            } else if (['perfumes', 'bones'].includes(cat)) {
+                boxTamanhosUnico.style.display = 'flex';
+            } else if (['camisas', 'camisas-time', 'agasalhos', 'moletons', 'conjuntos'].includes(cat)) {
                 boxTamanhosRoupas.style.display = 'flex';
-                boxTamanhosCalcados.style.display = 'none';
             } else if (cat === 'promocoes') {
                 boxTamanhosRoupas.style.display = 'flex';
                 boxTamanhosCalcados.style.display = 'flex';
-            } else {
-                boxTamanhosRoupas.style.display = 'none';
-                boxTamanhosCalcados.style.display = 'none';
+                boxTamanhosCalcas.style.display = 'flex';
+                boxTamanhosUnico.style.display = 'flex';
             }
         }
 
