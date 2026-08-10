@@ -1053,6 +1053,94 @@ window.gerarPagamentoPixMP = async function(dadosPedido) {
 // ==========================================
 // GERENCIAMENTO DE SEÇÕES E DOM
 // ==========================================
+// ==========================================
+// ESTADO GLOBAL DE FILTROS POR CATEGORIA
+// ==========================================
+const categoryFilters = {};
+
+// Função acionada ao alterar os filtros de qualquer categoria
+window.handleFilterChange = (catKey, type, value) => {
+    if (!categoryFilters[catKey]) {
+        categoryFilters[catKey] = { sort: 'default', size: 'all' };
+    }
+    categoryFilters[catKey][type] = value;
+
+    if (typeof allProducts !== 'undefined' && Array.isArray(allProducts)) {
+        renderProducts(allProducts);
+    }
+};
+
+// Injeta e atualiza a barra de filtros no cabeçalho de cada seção
+function ensureFilterUI(gridId, catKey) {
+    const grid = document.getElementById(gridId);
+    if (!grid) return;
+    const section = grid.closest('section') || grid.parentElement;
+    if (!section) return;
+
+    if (!section.querySelector(`.category-filters[data-cat="${catKey}"]`)) {
+        let h2 = section.querySelector('h2');
+        let titleHTML = h2 ? h2.outerHTML : `<h2 style="color: #ffffff;">COMPRAS</h2>`;
+        
+        const currentSort = categoryFilters[catKey]?.sort || 'default';
+
+        const headerDiv = document.createElement('div');
+        headerDiv.className = 'category-header-bar';
+        headerDiv.style.cssText = 'display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; width: 100%;';
+        
+        headerDiv.innerHTML = `
+            ${titleHTML}
+            <div class="category-filters" data-cat="${catKey}" style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+                <select class="filter-select filter-sort" style="background: #111; color: #fff; border: 1px solid #333; padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; cursor: pointer; outline: none;" onchange="handleFilterChange('${catKey}', 'sort', this.value)">
+                    <option value="default" ${currentSort === 'default' ? 'selected' : ''}>Ordenar por: Padrão</option>
+                    <option value="asc" ${currentSort === 'asc' ? 'selected' : ''}>Menor Preço</option>
+                    <option value="desc" ${currentSort === 'desc' ? 'selected' : ''}>Maior Preço</option>
+                </select>
+                <select class="filter-select filter-size" id="size-select-${catKey}" style="background: #111; color: #fff; border: 1px solid #333; padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; cursor: pointer; outline: none;" onchange="handleFilterChange('${catKey}', 'size', this.value)">
+                    <option value="all">Tamanho: Todos</option>
+                </select>
+            </div>
+        `;
+
+        if (h2) {
+            h2.replaceWith(headerDiv);
+        } else {
+            section.insertBefore(headerDiv, grid);
+        }
+    }
+}
+
+// Atualiza as opções de tamanho disponíveis com base nos produtos da categoria
+function updateSizeSelectOptions(catKey, productsForCat) {
+    const sizeSelect = document.getElementById(`size-select-${catKey}`);
+    if (!sizeSelect) return;
+
+    const currentVal = categoryFilters[catKey]?.size || 'all';
+
+    const allSizes = new Set();
+    productsForCat.forEach(p => {
+        const sizes = typeof getProductSizes === 'function' ? getProductSizes(p, catKey) : ['Único'];
+        sizes.forEach(sz => { if (sz) allSizes.add(sz); });
+    });
+
+    const sortedSizes = Array.from(allSizes).sort((a, b) => {
+        const numA = parseFloat(a), numB = parseFloat(b);
+        if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
+        return a.localeCompare(b);
+    });
+
+    let html = `<option value="all" ${currentVal === 'all' ? 'selected' : ''}>Tamanho: Todos</option>`;
+    sortedSizes.forEach(sz => {
+        const selected = sz === currentVal ? 'selected' : '';
+        html += `<option value="${sz}" ${selected}>Tamanho: ${sz}</option>`;
+    });
+
+    sizeSelect.innerHTML = html;
+}
+
+
+// ==========================================
+// 1. CONFIGURAÇÃO DA ESTRUTURA DOM (SEÇÕES)
+// ==========================================
 
 function setupPromocoesDOM() {
     let promoGrid = document.getElementById('promocoes-grid');
@@ -1073,7 +1161,7 @@ function setupPromocoesDOM() {
 
         if (referenceEl && referenceEl.parentNode) {
             referenceEl.parentNode.insertBefore(promoWrapper, referenceEl.nextSibling);
-        } else {
+        } else if (document.body) {
             document.body.appendChild(promoWrapper);
         }
     }
@@ -1099,37 +1187,13 @@ function setupMaisVendidosDOM() {
 
         if (camisasSection && camisasSection.parentNode) {
             camisasSection.parentNode.insertBefore(wrapper, camisasSection); 
-        } else {
+        } else if (document.body) {
             document.body.appendChild(wrapper);
         }
     }
 }
-// 👟 LÓGICA DE TÊNIS (ESTRUTURA DOM)
-function setupTenisDOM() {
-    let grid = document.getElementById('tenis-grid');
-    
-    if (!grid) {
-        const camisasTimeGrid = document.getElementById('camisas-time-grid') || document.getElementById('camisas-grid');
-        const referenceSection = camisasTimeGrid ? (camisasTimeGrid.closest('section') || camisasTimeGrid.parentElement) : null;
 
-        const tenisWrapper = document.createElement('section');
-        tenisWrapper.className = 'promocoes-wrapper';
-        tenisWrapper.id = 'tenis-section-wrapper';
-        
-        tenisWrapper.innerHTML = `
-            <h2 style="color: #ffffff;">👟 TÊNIS / SNKRS</h2>
-            <div id="tenis-grid" class="promocoes-carousel-grid" style="overflow-anchor: none;"></div>
-        `;
-
-        if (referenceSection && referenceSection.parentNode) {
-            referenceSection.parentNode.insertBefore(tenisWrapper, referenceSection.nextSibling);
-        } else {
-            document.body.appendChild(tenisWrapper);
-        }
-    }
-}
-
-// ⚽ CAMISAS DE TIME (Posicionada abaixo de Camisas, de 2 em 2)
+// ⚽ CAMISAS DE TIME (Posicionada abaixo de Camisas)
 function setupCamisasTimeDOM() {
     let grid = document.getElementById('camisas-time-grid');
     if (!grid) {
@@ -1146,13 +1210,61 @@ function setupCamisasTimeDOM() {
 
         if (camisasSection && camisasSection.parentNode) {
             camisasSection.parentNode.insertBefore(wrapper, camisasSection.nextSibling);
-        } else {
+        } else if (document.body) {
             document.body.appendChild(wrapper);
         }
     }
 }
 
-// 🧥 AGASALHOS (Posicionada abaixo de Blusas/Moletons)
+// 👕 CAMISETAS OVERSIZED (Posicionada abaixo de Camisas de Time)
+function setupCamisetasOversizedDOM() {
+    let grid = document.getElementById('camisetas-oversized-grid');
+    if (!grid) {
+        const referenceGrid = document.getElementById('camisas-time-grid') || document.getElementById('camisas-grid');
+        const referenceSection = referenceGrid ? (referenceGrid.closest('section') || referenceGrid.parentElement) : null;
+
+        const wrapper = document.createElement('section');
+        wrapper.className = 'promocoes-wrapper';
+        wrapper.id = 'camisetas-oversized-section-wrapper';
+        wrapper.innerHTML = `
+            <h2 style="color: #ffffff;">👕 CAMISETAS OVERSIZED</h2>
+            <div id="camisetas-oversized-grid" class="promocoes-carousel-grid"></div>
+        `;
+
+        if (referenceSection && referenceSection.parentNode) {
+            referenceSection.parentNode.insertBefore(wrapper, referenceSection.nextSibling);
+        } else if (document.body) {
+            document.body.appendChild(wrapper);
+        }
+    }
+}
+
+// 👟 LÓGICA DE TÊNIS
+function setupTenisDOM() {
+    let grid = document.getElementById('tenis-grid');
+    
+    if (!grid) {
+        const referenceGrid = document.getElementById('camisetas-oversized-grid') || document.getElementById('camisas-time-grid') || document.getElementById('camisas-grid');
+        const referenceSection = referenceGrid ? (referenceGrid.closest('section') || referenceGrid.parentElement) : null;
+
+        const tenisWrapper = document.createElement('section');
+        tenisWrapper.className = 'promocoes-wrapper';
+        tenisWrapper.id = 'tenis-section-wrapper';
+        
+        tenisWrapper.innerHTML = `
+            <h2 style="color: #ffffff;">👟 TÊNIS / SNKRS</h2>
+            <div id="tenis-grid" class="promocoes-carousel-grid" style="overflow-anchor: none;"></div>
+        `;
+
+        if (referenceSection && referenceSection.parentNode) {
+            referenceSection.parentNode.insertBefore(tenisWrapper, referenceSection.nextSibling);
+        } else if (document.body) {
+            document.body.appendChild(tenisWrapper);
+        }
+    }
+}
+
+// 🧥 AGASALHOS
 function setupAgasalhosDOM() {
     let grid = document.getElementById('agasalhos-grid');
     if (!grid) {
@@ -1169,13 +1281,13 @@ function setupAgasalhosDOM() {
 
         if (moletonsSection && moletonsSection.parentNode) {
             moletonsSection.parentNode.insertBefore(wrapper, moletonsSection.nextSibling);
-        } else {
+        } else if (document.body) {
             document.body.appendChild(wrapper);
         }
     }
 }
 
-// 👖 CALÇAS DE ALFAIATARIA (Posicionada abaixo de Calças Cargo ou Calças)
+// 👖 CALÇAS DE ALFAIATARIA / CUECAS
 function setupCalcasAlfaiatariaDOM() {
     let grid = document.getElementById('calcas-alfaiataria-grid');
     if (!grid) {
@@ -1192,13 +1304,13 @@ function setupCalcasAlfaiatariaDOM() {
 
         if (cargoSection && cargoSection.parentNode) {
             cargoSection.parentNode.insertBefore(wrapper, cargoSection.nextSibling);
-        } else {
+        } else if (document.body) {
             document.body.appendChild(wrapper);
         }
     }
 }
 
-// 👖 CALÇAS CARGO (Posicionada abaixo de Calças)
+// 👖 CALÇAS CARGO / SHORTS
 function setupCalcasCargoDOM() {
     let grid = document.getElementById('calcas-cargo-grid');
     if (!grid) {
@@ -1215,18 +1327,17 @@ function setupCalcasCargoDOM() {
 
         if (calcasSection && calcasSection.parentNode) {
             calcasSection.parentNode.insertBefore(wrapper, calcasSection.nextSibling);
-        } else {
+        } else if (document.body) {
             document.body.appendChild(wrapper);
         }
     }
 }
 
-// 🩴 CHINELOS (Posicionada abaixo de Agasalhos, com margem)
+// 🩴 CHINELOS
 function setupChinelosDOM() {
     let grid = document.getElementById('chinelos-grid');
     
     if (!grid) {
-        // Busca a seção de Agasalhos para colocar logo abaixo dela. Se não existir, tenta Blusas.
         const agasalhosGrid = document.getElementById('agasalhos-grid');
         const blusasGrid = document.getElementById('blusas-grid') || document.getElementById('moletons-grid');
         
@@ -1241,8 +1352,6 @@ function setupChinelosDOM() {
         const chinelosWrapper = document.createElement('section');
         chinelosWrapper.className = 'promocoes-wrapper';
         chinelosWrapper.id = 'chinelos-section-wrapper';
-        
-        // Espaçamento para desgrudar da seção anterior (Agasalhos)
         chinelosWrapper.style.marginTop = '40px'; 
         
         chinelosWrapper.innerHTML = `
@@ -1262,19 +1371,28 @@ function setupChinelosDOM() {
     return grid;
 }
 
-// Ouvinte em tempo real do banco de dados
+// ==========================================
+// 2. ESCUTADOR FIRESTORE / BANCO DE DADOS
+// ==========================================
+
 onSnapshot(productsCol, (snapshot) => {
     allProducts = [];
     snapshot.forEach(doc => allProducts.push({ id: doc.id, ...doc.data() }));
     renderProducts(allProducts);
-    initBannerClicks();
 
-    if (currentDetailProductId) {
+    if (typeof initBannerClicks === 'function') {
+        initBannerClicks();
+    }
+
+    if (typeof currentDetailProductId !== 'undefined' && currentDetailProductId) {
         openProductDetail(currentDetailProductId);
     }
 });
 
-// Helper para criar Card de Produto com Tamanhos Dinâmicos
+// ==========================================
+// 3. AUXILIARES DE RENDERIZAÇÃO E CARDS
+// ==========================================
+
 function createProductCard(p, category, isMaisSaido) {
     const title = p.nome || p.title || 'Produto HYPE';
     const price = parseFloat(p.preco || p.price || 0);
@@ -1284,15 +1402,18 @@ function createProductCard(p, category, isMaisSaido) {
     const card = document.createElement('div');
     card.className = 'card';
 
-    // Obtém estritamente os tamanhos cadastrados no ADM
-    const availableSizes = getProductSizes(p, category);
+    const availableSizes = typeof getProductSizes === 'function' ? getProductSizes(p, category) : ['Único'];
 
-    if (!selectedSizes[p.id] || !availableSizes.includes(selectedSizes[p.id])) {
-        selectedSizes[p.id] = availableSizes[0] || 'Único';
+    if (typeof selectedSizes !== 'undefined') {
+        if (!selectedSizes[p.id] || !availableSizes.includes(selectedSizes[p.id])) {
+            selectedSizes[p.id] = availableSizes[0] || 'Único';
+        }
     }
 
+    const currentSelected = (typeof selectedSizes !== 'undefined' && selectedSizes[p.id]) ? selectedSizes[p.id] : (availableSizes[0] || 'Único');
+
     const sizeOptions = availableSizes.map(sz => `
-        <button class="size-btn ${selectedSizes[p.id] === sz ? 'selected' : ''}" onclick="event.stopPropagation(); selectSize('${p.id}', '${sz}', this)">${sz}</button>
+        <button class="size-btn ${currentSelected === sz ? 'selected' : ''}" onclick="event.stopPropagation(); selectSize('${p.id}', '${sz}', this)">${sz}</button>
     `).join('');
 
     let priceDisplayHTML = `<span class="price-tag">R$ ${price.toFixed(2).replace('.', ',')}</span>`;
@@ -1307,7 +1428,7 @@ function createProductCard(p, category, isMaisSaido) {
         `;
     }
 
-      let badgeHTML = category === 'promocoes' ? `<span class="badge-vip">OFF</span>` : '';
+    let badgeHTML = category === 'promocoes' ? `<span class="badge-vip">OFF</span>` : '';
     if (isMaisSaido) {
         badgeHTML = `<span class="badge-vip badge-top">🔥 MAIS SAÍDO</span>`;
     }
@@ -1331,18 +1452,20 @@ function createProductCard(p, category, isMaisSaido) {
 }
 
 function renderProducts(products) {
-    setupMaisVendidosDOM();      // Mais vendidos entra ANTES de Camisas
+    setupMaisVendidosDOM(); 
     setupPromocoesDOM();
-    setupCamisasTimeDOM();       // Camisas de time em grade 2x2
+    setupCamisasTimeDOM();
+    setupCamisetasOversizedDOM();
     setupTenisDOM();
     setupChinelosDOM();
     setupCalcasCargoDOM();
-    setupCalcasAlfaiatariaDOM();  // Nova seção Calças de Alfaiataria
-    setupAgasalhosDOM();         // Nova seção Agasalhos
+    setupCalcasAlfaiatariaDOM();
+    setupAgasalhosDOM();
 
     const grids = {
         'camisas': document.getElementById('camisas-grid'),
         'camisas-time': document.getElementById('camisas-time-grid'),
+        'camisetas-oversized': document.getElementById('camisetas-oversized-grid'),
         'tenis': document.getElementById('tenis-grid'),
         'conjuntos': document.getElementById('conjuntos-grid'),
         'promocoes': document.getElementById('promocoes-grid'),
@@ -1357,6 +1480,14 @@ function renderProducts(products) {
         'mais-vendidos': document.getElementById('mais-vendidos-grid') || document.getElementById('mais-vendidos') || document.getElementById('destaques-grid') || document.getElementById('mais-saidos-grid')
     };
 
+    // Injeta os seletores de filtros em cada seção do DOM
+    Object.keys(grids).forEach(key => {
+        if (grids[key]) {
+            ensureFilterUI(grids[key].id, key);
+        }
+    });
+
+    // Limpa o conteúdo dos grids
     Object.values(grids).forEach(grid => { if (grid) grid.innerHTML = ''; });
 
     const targetNames = [
@@ -1372,45 +1503,85 @@ function renderProducts(products) {
 
     const topProductIds = new Set(topProducts.map(p => p.id));
 
-    if (grids['mais-vendidos']) {
-        if (topProducts.length > 0) {
-            topProducts.forEach(p => {
-                const card = createProductCard(p, 'mais-vendidos', true);
-                grids['mais-vendidos'].appendChild(card);
-            });
-        } else {
-            grids['mais-vendidos'].innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: var(--text-dim); padding: 20px; font-size: 0.85rem;">Nenhum dos produtos selecionados foi encontrado no catálogo.</div>`;
-        }
-    }
+    // Agrupa os produtos por categoria
+    const categorized = {};
+    Object.keys(grids).forEach(k => categorized[k] = []);
+
+    categorized['mais-vendidos'] = topProducts;
 
     products.forEach(p => {
-        let category = normalizeCategory(p.categoria || p.category);
-        
+        let rawCategoryStr = String(p.categoria || p.category || '').toLowerCase().trim();
+        let category = typeof normalizeCategory === 'function' ? normalizeCategory(p.categoria || p.category) : rawCategoryStr;
+
+        if (rawCategoryStr.includes('oversized') || rawCategoryStr.includes('oversize')) {
+            category = 'camisetas-oversized';
+        }
+
         if (p.promocao === true || p.emPromocao === true || p.promo === true) {
             category = 'promocoes';
         }
 
-        if (!grids[category]) return;
-
-        const isMaisSaido = topProductIds.has(p.id);
-        const card = createProductCard(p, category, isMaisSaido);
-        grids[category].appendChild(card);
+        if (categorized[category]) {
+            categorized[category].push(p);
+        }
     });
 
-    Object.keys(grids).forEach(key => {
-        if (grids[key] && key !== 'mais-vendidos' && grids[key].innerHTML === '') {
-            grids[key].innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: var(--text-dim); padding: 40px; border: 1px dashed var(--border); border-radius: 8px; font-size: 0.9rem;">Nenhum drop disponível.</div>`;
+    // Aplica filtros, ordenação e renderiza cada categoria
+    Object.keys(grids).forEach(catKey => {
+        const grid = grids[catKey];
+        if (!grid) return;
+
+        let catProds = [...(categorized[catKey] || [])];
+
+        // Atualiza a lista de tamanhos disponíveis no select da categoria
+        updateSizeSelectOptions(catKey, catProds);
+
+        const filterState = categoryFilters[catKey] || { sort: 'default', size: 'all' };
+
+        // 1. Filtro por Tamanho
+        if (filterState.size && filterState.size !== 'all') {
+            catProds = catProds.filter(p => {
+                const sizes = typeof getProductSizes === 'function' ? getProductSizes(p, catKey) : ['Único'];
+                return sizes.includes(filterState.size);
+            });
+        }
+
+        // 2. Ordenação por Preço
+        if (filterState.sort === 'asc') {
+            catProds.sort((a, b) => parseFloat(a.preco || a.price || 0) - parseFloat(b.preco || b.price || 0));
+        } else if (filterState.sort === 'desc') {
+            catProds.sort((a, b) => parseFloat(b.preco || b.price || 0) - parseFloat(a.preco || a.price || 0));
+        }
+
+        // 3. Renderização final dos cards
+        if (catProds.length > 0) {
+            catProds.forEach(p => {
+                const isMaisSaido = topProductIds.has(p.id);
+                const card = createProductCard(p, catKey, isMaisSaido);
+                grid.appendChild(card);
+            });
+        } else {
+            grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: var(--text-dim, #888); padding: 40px; border: 1px dashed var(--border, #333); border-radius: 8px; font-size: 0.9rem;">Nenhum produto encontrado com os filtros selecionados.</div>`;
         }
     });
 }
 
-// Modal de Detalhes do Produto
+// ==========================================
+// 4. MODAL DE DETALHES E INTERAÇÕES
+// ==========================================
+
 window.openProductDetail = (id) => {
+    if (typeof allProducts === 'undefined') return;
     const product = allProducts.find(p => p.id === id);
     if (!product) return;
 
     currentDetailProductId = id;
-    let rawCategory = normalizeCategory(product.categoria || product.category);
+    let rawCategoryStr = String(product.categoria || product.category || '').toLowerCase().trim();
+    let rawCategory = typeof normalizeCategory === 'function' ? normalizeCategory(product.categoria || product.category) : rawCategoryStr;
+
+    if (rawCategoryStr.includes('oversized') || rawCategoryStr.includes('oversize')) {
+        rawCategory = 'camisetas-oversized';
+    }
 
     const title = product.nome || product.title || 'Produto HYPE';
     const price = parseFloat(product.preco || product.price || 0);
@@ -1438,17 +1609,24 @@ window.openProductDetail = (id) => {
         `;
     }
 
-    const availableSizes = getProductSizes(product, rawCategory);
-    if (!selectedSizes[id] || !availableSizes.includes(selectedSizes[id])) {
-        selectedSizes[id] = availableSizes[0] || 'Único';
+    const availableSizes = typeof getProductSizes === 'function' ? getProductSizes(product, rawCategory) : ['Único'];
+    
+    if (typeof selectedSizes !== 'undefined') {
+        if (!selectedSizes[id] || !availableSizes.includes(selectedSizes[id])) {
+            selectedSizes[id] = availableSizes[0] || 'Único';
+        }
     }
 
+    const currentSelected = (typeof selectedSizes !== 'undefined' && selectedSizes[id]) ? selectedSizes[id] : (availableSizes[0] || 'Único');
+
     const sizesBtns = availableSizes.map(sz => `
-        <button class="size-btn ${selectedSizes[id] === sz ? 'selected' : ''}" onclick="selectDetailSize('${id}', '${sz}', this)">${sz}</button>
+        <button class="size-btn ${currentSelected === sz ? 'selected' : ''}" onclick="selectDetailSize('${id}', '${sz}', this)">${sz}</button>
     `).join('');
 
     const related = allProducts.filter(p => {
-        let cat = normalizeCategory(p.categoria || p.category);
+        let catStr = String(p.categoria || p.category || '').toLowerCase().trim();
+        let cat = typeof normalizeCategory === 'function' ? normalizeCategory(p.categoria || p.category) : catStr;
+        if (catStr.includes('oversized') || catStr.includes('oversize')) cat = 'camisetas-oversized';
         return cat === rawCategory && p.id !== id;
     });
 
@@ -1474,54 +1652,60 @@ window.openProductDetail = (id) => {
     }
 
     const detailContainer = document.getElementById('product-detail-view');
-    detailContainer.innerHTML = `
-        <div class="detail-header">
-            <button class="back-btn" onclick="closeProductDetail()">← VOLTAR AO CATÁLOGO</button>
-            <span class="${badgeClass}">${badgeText}</span>
-        </div>
-
-        <div class="detail-main">
-            <div class="detail-img-box">
-                <img src="${img}" alt="${title}">
+    if (detailContainer) {
+        detailContainer.innerHTML = `
+            <div class="detail-header">
+                <button class="back-btn" onclick="closeProductDetail()">← VOLTAR AO CATÁLOGO</button>
+                <span class="${badgeClass}">${badgeText}</span>
             </div>
-            <div class="detail-info">
-                <h2>${title}</h2>
-                <div class="detail-price-box">
-                    ${detailPriceHTML}
-                    <span class="detail-installments">💳 até <strong>${numParcelas}x de R$ ${valorParcela}</strong> </span>
-                </div>
 
-                <div>
-                    <div class="detail-sizes-title">Selecione o Tamanho:</div>
-                    <div class="detail-sizes-row" id="detail-sizes-row">
-                        ${sizesBtns}
+            <div class="detail-main">
+                <div class="detail-img-box">
+                    <img src="${img}" alt="${title}">
+                </div>
+                <div class="detail-info">
+                    <h2>${title}</h2>
+                    <div class="detail-price-box">
+                        ${detailPriceHTML}
+                        <span class="detail-installments">💳 até <strong>${numParcelas}x de R$ ${valorParcela}</strong> </span>
                     </div>
+
+                    <div>
+                        <div class="detail-sizes-title">Selecione o Tamanho:</div>
+                        <div class="detail-sizes-row" id="detail-sizes-row">
+                            ${sizesBtns}
+                        </div>
+                    </div>
+
+                    <button class="add-btn" style="padding: 18px; font-size: 0.95rem; font-weight: 800; letter-spacing: 1.5px; margin-top: 10px;" onclick="addToCart('${id}')">ADICIONAR À BAG</button>
                 </div>
-
-                <button class="add-btn" style="padding: 18px; font-size: 0.95rem; font-weight: 800; letter-spacing: 1.5px; margin-top: 10px;" onclick="addToCart('${id}')">ADICIONAR À BAG</button>
             </div>
-        </div>
 
-        <div class="carousel-section">
-            <h3>Produtos Relacionados</h3>
-            <div class="related-carousel">
-                ${relatedCardsHTML}
+            <div class="carousel-section">
+                <h3>Produtos Relacionados</h3>
+                <div class="related-carousel">
+                    ${relatedCardsHTML}
+                </div>
             </div>
-        </div>
-    `;
+        `;
 
-    detailContainer.classList.add('active');
-    detailContainer.scrollTop = 0;
+        detailContainer.classList.add('active');
+        detailContainer.scrollTop = 0;
+    }
 };
 
 window.closeProductDetail = () => {
     currentDetailProductId = null;
     const detailContainer = document.getElementById('product-detail-view');
-    if (detailContainer) detailContainer.classList.remove('active');
+    if (detailContainer) {
+        detailContainer.classList.remove('active');
+    }
 };
 
 window.selectDetailSize = (id, size, btnElement) => {
-    selectedSizes[id] = size;
+    if (typeof selectedSizes !== 'undefined') {
+        selectedSizes[id] = size;
+    }
     const container = document.getElementById('detail-sizes-row');
     if (container) {
         container.querySelectorAll('.size-btn').forEach(b => b.classList.remove('selected'));
@@ -1532,11 +1716,11 @@ window.selectDetailSize = (id, size, btnElement) => {
 };
 
 window.logoutUser = () => {
-    currentUser = null;
+    if (typeof currentUser !== 'undefined') currentUser = null;
     localStorage.removeItem('hype_user');
-    if (unsubscribeOrders) unsubscribeOrders();
     
-    updateUserHeaderUI();
+    if (typeof unsubscribeOrders === 'function') unsubscribeOrders();
+    if (typeof updateUserHeaderUI === 'function') updateUserHeaderUI();
     
     const loginForm = document.getElementById('simple-login-form');
     const ordersView = document.getElementById('user-orders-view');
@@ -1546,7 +1730,9 @@ window.logoutUser = () => {
     if (ordersView) ordersView.style.display = 'none';
     if (title) title.textContent = 'Acessar Minha Conta';
     
-    showToast("Você saiu da conta.");
+    if (typeof showToast === 'function') {
+        showToast("Você saiu da conta.");
+    }
 };
 
 function updateUserHeaderUI() {
