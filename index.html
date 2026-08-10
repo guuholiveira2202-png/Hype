@@ -1595,7 +1595,7 @@ window.openProductDetail = (id) => {
     const badgeClass = isMaisSaido ? 'badge-vip badge-top' : 'badge-vip';
     const badgeText = isMaisSaido ? '🔥 MAIS SAÍDO' : 'DROP EXCLUSIVO';
 
-    const numParcelas = 10;
+    const numParcelas = 5;
     const valorParcela = (price / numParcelas).toFixed(2).replace('.', ',');
 
     let detailPriceHTML = `<span class="detail-price">R$ ${price.toFixed(2).replace('.', ',')}</span>`;
@@ -1667,7 +1667,7 @@ window.openProductDetail = (id) => {
                     <h2>${title}</h2>
                     <div class="detail-price-box">
                         ${detailPriceHTML}
-                        <span class="detail-installments">💳 até <strong>${numParcelas}x de R$ ${valorParcela}</strong> </span>
+                        <span class="detail-installments">💳 até <strong>${5}x de R$ ${valorParcela}</strong>sem juros </span>
                     </div>
 
                     <div>
