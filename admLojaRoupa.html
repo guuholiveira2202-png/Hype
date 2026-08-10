@@ -270,6 +270,7 @@
                             <select id="prod-categoria" required>
                                 <option value="camisas">Camisas Casuais</option>
                                 <option value="camisas-time">Camisas de Time / Seleções</option>
+                                <option value="camisetas-oversized">Camisetas Oversized</option>
                                 <option value="agasalhos">Agasalhos</option>
                                 <option value="calcas-cargo">SHORTS</option>
                                 <option value="calcas-alfaiataria">CUECAS</option>
@@ -369,6 +370,7 @@
                 <button class="tab-btn active" data-filter="todos">Todos</button>
                 <button class="tab-btn" data-filter="camisas">Camisas Casuais</button>
                 <button class="tab-btn" data-filter="camisas-time">Camisas de Time</button>
+                <button class="tab-btn" data-filter="camisetas-oversized">Camisetas Oversized</button>
                 <button class="tab-btn" data-filter="agasalhos">Agasalhos</button>
                 <button class="tab-btn" data-filter="calcas-cargo">Calças Cargo</button>
                 <button class="tab-btn" data-filter="calcas-alfaiataria">Alfaiataria</button>
@@ -667,7 +669,7 @@
                 boxTamanhosCalcas.style.display = 'flex';
             } else if (['perfumes', 'bones'].includes(cat)) {
                 boxTamanhosUnico.style.display = 'flex';
-            } else if (['camisas', 'camisas-time', 'agasalhos', 'moletons', 'conjuntos'].includes(cat)) {
+            } else if (['camisas', 'camisas-time', 'camisetas-oversized', 'agasalhos', 'moletons', 'conjuntos'].includes(cat)) {
                 boxTamanhosRoupas.style.display = 'flex';
             } else if (cat === 'promocoes') {
                 boxTamanhosRoupas.style.display = 'flex';
